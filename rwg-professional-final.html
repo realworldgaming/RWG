@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real World Gaming — Proof of Play</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════
+   RESET & VARIABLES
+═══════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --red:       #C40000;
+  --red-dark:  #8B0000;
+  --red-glow:  rgba(196,0,0,0.2);
+  --red-soft:  rgba(196,0,0,0.07);
+  --bg:        #000000;
+  --bg2:       #080808;
+  --bg3:       #101010;
+  --bg4:       #161616;
+  --line:      rgba(255,255,255,0.06);
+  --line-red:  rgba(196,0,0,0.3);
+  --white:     #F0EDE8;
+  --off:       #888888;
+  --dim:       #444444;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════
+   CUSTOM CURSOR (desktop only)
+═══════════════════════════════════════════════ */
+@media (pointer: fine) {
+  body { cursor: none; }
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s;
+  }
+  .cursor-ring {
+    width: 30px; height: 30px;
+    border: 1px solid rgba(196,0,0,0.5);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: width 0.15s, height 0.15s;
+  }
+}
+
+@media (pointer: coarse) {
+  .cursor, .cursor-ring { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   CINEMATIC INTRO
+═══════════════════════════════════════════════ */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Skip button — visible on ALL devices */
+.skip-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+  background: transparent;
+  border: 1px solid rgba(196,0,0,0.4);
+  color: rgba(255,255,255,0.5);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0;
+  animation: fadeInSkip 1s 2s forwards;
+}
+.skip-btn:hover { border-color: var(--red); color: var(--white); }
+@keyframes fadeInSkip { to { opacity: 1; } }
+
+/* Rain */
+#rain-canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* City silhouette */
+.city-layer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45vh;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 3s ease 1s;
+}
+.city-layer svg { width: 100%; height: 100%; fill: #080808; }
+
+/* City lights */
+.city-lights {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40vh;
+  opacity: 0;
+  transition: opacity 4s ease 2s;
+}
+.light-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: lightFlicker var(--dur,3s) ease-in-out infinite;
+  animation-delay: var(--delay,0s);
+}
+@keyframes lightFlicker {
+  0%,100% { opacity: var(--max,0.8); }
+  50%      { opacity: var(--min,0.2); }
+}
+
+/* Fog bottom */
+.fog-layer {
+  position: absolute;
+  bottom: 0; left: -50%; right: -50%;
+  height: 200px;
+  background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Moving vehicle */
+.vehicles-layer {
+  position: absolute;
+  bottom: 15vh; left: 0; right: 0;
+  height: 80px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.moto {
+  position: absolute;
+  bottom: 10px; left: -120px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: motoPass 3.2s cubic-bezier(0.25,0,1,1) forwards;
+}
+.moto-body { width: 60px; height: 20px; background: #1a1a1a; border-radius: 4px; position: relative; }
+.moto-body::after { content: ''; position: absolute; right: -4px; top: 4px; width: 4px; height: 12px; background: var(--red); box-shadow: 0 0 8px var(--red); border-radius: 0 2px 2px 0; }
+.moto-wheel { width: 16px; height: 16px; border: 2px solid #333; border-radius: 50%; }
+@keyframes motoPass { 0% { left: -120px; } 100% { left: 110%; } }
+
+.heli-light {
+  position: absolute;
+  top: 8vh; left: -100px;
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: heliPass 5s ease-in-out forwards;
+  animation-delay: 2s;
+  opacity: 0;
+}
+@keyframes heliPass {
+  0%  { left: -100px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100%{ left: 110%; opacity: 0; }
+}
+
+/* Phase 1 — brand intro */
+#introStep1 {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.intro-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 10vw, 100px);
+  letter-spacing: 10px;
+  color: var(--white);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.8s ease, transform 1.8s ease;
+  text-shadow: 0 0 60px rgba(196,0,0,0.4);
+}
+.intro-brand.visible { opacity: 1; transform: translateY(0); }
+.intro-sub-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 300;
+  letter-spacing: 8px;
+  color: var(--red);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.intro-sub-text.visible { opacity: 1; }
+.intro-tagline {
+  font-size: clamp(11px,1.5vw,13px);
+  letter-spacing: 5px;
+  color: var(--off);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  margin-top: 8px;
+}
+.intro-tagline.visible { opacity: 1; }
+
+/* Phase 2 — logo reveal */
+.logo-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  z-index: 20;
+}
+.logo-reveal.visible { opacity: 1; }
+
+.logo-mark-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.logo-glow {
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(196,0,0,0.15) 0%, transparent 70%);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%,100%{transform:scale(1);opacity:0.7;} 50%{transform:scale(1.3);opacity:1;} }
+
+.logo-text-xl {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(90px, 20vw, 200px);
+  letter-spacing: 12px;
+  position: relative;
+  color: var(--white);
+  filter: drop-shadow(0 0 40px rgba(196,0,0,0.5));
+}
+.logo-text-xl span { color: var(--red); }
+
+/* Particles */
+.logo-particles { position: absolute; inset: -50px; pointer-events: none; }
+.lp {
+  position: absolute;
+  width: var(--s,3px); height: var(--s,3px);
+  background: var(--red);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatP var(--dur,4s) ease-in-out infinite;
+  animation-delay: var(--dl,0s);
+  left: var(--x,50%); top: var(--y,50%);
+}
+@keyframes floatP {
+  0%  { opacity:0; transform:translateY(0) scale(0); }
+  20% { opacity:0.8; transform:translateY(-20px) scale(1); }
+  80% { opacity:0.3; transform:translateY(-80px) scale(0.5); }
+  100%{ opacity:0; transform:translateY(-120px) scale(0); }
+}
+
+.tagline-reveal {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 2.5vw, 24px);
+  font-weight: 600;
+  letter-spacing: 12px;
+  color: var(--white);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1.2s ease 0.5s, transform 1.2s ease 0.5s;
+}
+.tagline-reveal.visible { opacity: 1; transform: translateY(0); }
+
+.enter-btn {
+  margin-top: 40px;
+  padding: 0 52px;
+  height: 56px;
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease 1s, transform 1s ease 1s, color 0.3s;
+}
+.enter-btn.visible { opacity: 1; transform: translateY(0); }
+.enter-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+  z-index: -1;
+}
+.enter-btn:hover { color: #fff; }
+.enter-btn:hover::before { transform: scaleX(1); }
+
+/* ═══════════════════════════════════════════════
+   MAIN WEBSITE
+═══════════════════════════════════════════════ */
+#website { opacity: 0; transition: opacity 1.5s ease; display: none; }
+#website.visible { opacity: 1; display: block; }
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 500;
+  height: 64px;
+  background: rgba(0,0,0,0.94);
+  border-bottom: 1px solid var(--line-red);
+  backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  transform: translateY(-100%);
+  transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+nav.visible { transform: translateY(0); }
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-logo-mark {
+  width: 30px; height: 30px;
+  background: var(--red);
+  clip-path: polygon(0 0,100% 0,100% 72%,72% 100%,0 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue'; font-size: 12px; color: white; letter-spacing: 0;
+}
+.nav-logo-text { font-family: 'Bebas Neue'; font-size: 22px; letter-spacing: 3px; color: var(--white); }
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.nav-link {
+  padding: 0 20px;
+  height: 64px;
+  display: flex; align-items: center;
+  color: var(--off);
+  text-decoration: none;
+  font-family: 'Rajdhani'; font-weight: 600; font-size: 13px;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20px; right: 20px;
+  height: 1px;
+  background: var(--red);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+.nav-link:hover { color: var(--white); }
+.nav-link:hover::after { transform: scaleX(1); }
+
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.nav-cta {
+  height: 36px; padding: 0 20px;
+  background: var(--red); border: none;
+  color: white; font-family: 'Rajdhani'; font-weight: 700;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: background 0.2s;
+  text-decoration: none; display: flex; align-items: center;
+}
+.nav-cta:hover { background: #a00; }
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  background: none;
+  border: none;
+  z-index: 10;
+}
+.hamburger span {
+  display: block;
+  width: 22px; height: 2px;
+  background: var(--white);
+  transition: all 0.3s;
+  transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile menu */
+.mobile-menu {
+  position: fixed;
+  top: 64px; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.98);
+  backdrop-filter: blur(20px);
+  z-index: 490;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 2rem 3rem;
+  gap: 0;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.77,0,0.18,1);
+  border-top: 1px solid var(--line-red);
+  overflow-y: auto;
+}
+.mobile-menu.open { transform: translateX(0); }
+.mobile-menu a {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  color: var(--off);
+  text-decoration: none;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.2s, padding-left 0.25s;
+  display: block;
+}
+.mobile-menu a:hover { color: var(--red); padding-left: 0.4rem; }
+.mobile-menu .m-cta {
+  margin-top: 2rem;
+  background: var(--red);
+  color: white !important;
+  text-align: center;
+  padding: 1rem !important;
+  border: none !important;
+  font-size: 1.6rem !important;
+  letter-spacing: 0.12em !important;
+}
+.mobile-menu .m-invest {
+  margin-top: 0.5rem;
+  border: 1px solid var(--line-red) !important;
+  color: var(--red) !important;
+  text-align: center;
+  padding: 1rem !important;
+  font-size: 1.2rem !important;
+  letter-spacing: 0.12em !important;
+  background: rgba(196,0,0,0.05) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+#heroCityCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.92) 35%, rgba(0,0,0,0.5) 65%, rgba(0,0,0,0.1) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%);
+}
+.hero-content {
+  position: relative;
+  z-index: 10;
+  padding: 0 80px;
+  max-width: 820px;
+}
+
+/* Animated entrance */
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 5px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0;
+  animation: slideUp 0.7s 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.hero-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--red); }
+
+.hero-title {
+  font-family: 'Bebas Neue';
+  font-size: clamp(60px, 10vw, 115px);
+  letter-spacing: 4px;
+  line-height: 0.88;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: slideUp 0.8s 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.hero-title .red { color: var(--red); }
+.hero-title .stroke { -webkit-text-stroke: 2px rgba(255,255,255,0.6); color: transparent; display: block; }
+
+.hero-line {
+  width: 50px; height: 2px;
+  background: linear-gradient(90deg, var(--red), transparent);
+  margin: 20px 0;
+  opacity: 0;
+  animation: slideUp 0.5s 0.7s forwards;
+}
+
+.hero-desc {
+  font-size: 17px; font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.75;
+  max-width: 520px;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: slideUp 0.7s 0.8s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.hero-desc strong { color: var(--white); font-weight: 600; }
+
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: slideUp 0.7s 1s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(22px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* Buttons */
+.btn-primary {
+  height: 52px; padding: 0 36px;
+  background: var(--red); border: none;
+  color: white;
+  font-family: 'Rajdhani'; font-weight: 700;
+  font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s;
+  position: relative; overflow: hidden;
+  clip-path: polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+.btn-primary:hover { background: #a00; box-shadow: 0 0 24px rgba(196,0,0,0.5); }
+.btn-primary:hover::after { transform: translateX(100%); }
+
+.btn-outline {
+  height: 52px; padding: 0 36px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  font-family: 'Rajdhani'; font-weight: 700;
+  font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s;
+  clip-path: polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.btn-outline:hover { border-color: var(--red); color: var(--white); }
+
+/* Hero bottom stats */
+.hero-stats {
+  position: absolute;
+  bottom: 48px; left: 80px;
+  display: flex; gap: 48px;
+  z-index: 10;
+  opacity: 0;
+  animation: slideUp 0.7s 1.2s forwards;
+}
+.h-stat { display: flex; flex-direction: column; gap: 4px; }
+.h-stat-val { font-family: 'Bebas Neue'; font-size: 36px; letter-spacing: 2px; color: var(--red); line-height: 1; }
+.h-stat-key { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--off); text-transform: uppercase; }
+
+/* Scan line */
+.hero::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(196,0,0,0.4), transparent);
+  animation: scan 7s linear infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes scan { 0%{top:0;opacity:1;} 90%{opacity:1;} 100%{top:100%;opacity:0;} }
+
+/* ═══════════════════════════════════════════════
+   TICKER
+═══════════════════════════════════════════════ */
+.ticker-wrap {
+  display: flex;
+  border-top: 1px solid var(--line-red);
+  border-bottom: 1px solid var(--line-red);
+  overflow: hidden;
+  background: var(--bg2);
+}
+.ticker-label {
+  background: var(--red);
+  padding: 0.7rem 1.5rem;
+  font-family: 'Bebas Neue'; font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  display: flex; align-items: center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.ticker-track { overflow: hidden; flex: 1; padding: 0.7rem 0; }
+.ticker-inner {
+  display: inline-flex;
+  gap: 3rem;
+  white-space: nowrap;
+  animation: tickerScroll 30s linear infinite;
+  font-family: 'JetBrains Mono'; font-size: 0.68rem;
+  letter-spacing: 0.12em; color: var(--off); text-transform: uppercase;
+}
+.ticker-inner .sep { color: var(--red-dark); }
+@keyframes tickerScroll { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+/* ═══════════════════════════════════════════════
+   SECTIONS — SHARED
+═══════════════════════════════════════════════ */
+section { padding: 100px 80px; position: relative; }
+
+.section-number {
+  position: absolute;
+  top: 40px; right: 80px;
+  font-family: 'Bebas Neue';
+  font-size: 100px;
+  color: rgba(196,0,0,0.05);
+  letter-spacing: 4px;
+  line-height: 1;
+  user-select: none;
+}
+
+.eyebrow {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content: '//'; color: var(--red-dark); font-family: 'JetBrains Mono'; font-size: 10px; }
+
+h2 {
+  font-family: 'Bebas Neue';
+  font-size: clamp(38px, 6vw, 68px);
+  letter-spacing: 3px;
+  line-height: 0.95;
+  margin-bottom: 12px;
+}
+h2 .red   { color: var(--red); }
+h2 .stroke { -webkit-text-stroke: 1.5px var(--white); color: transparent; }
+
+.section-line {
+  width: 40px; height: 2px;
+  background: linear-gradient(90deg, var(--red), transparent);
+  margin: 18px 0 22px;
+}
+
+p.large {
+  font-size: 16px; font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  max-width: 540px;
+}
+p.large strong { color: var(--white); font-weight: 600; }
+
+/* Scroll reveal */
+.fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+.fade-in.in { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+
+/* ═══════════════════════════════════════════════
+   PROBLEM
+═══════════════════════════════════════════════ */
+.section-problem { background: var(--bg2); border-top: 1px solid var(--line); }
+
+.problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+
+.problem-numbers { display: flex; flex-direction: column; gap: 28px; }
+
+.problem-stat {
+  border-left: 2px solid var(--red);
+  padding-left: 22px;
+  transition: border-left-width 0.2s;
+}
+.problem-stat:hover { border-left-width: 4px; }
+
+.problem-stat-num {
+  font-family: 'Bebas Neue';
+  font-size: 52px; color: var(--red);
+  letter-spacing: 2px; line-height: 1;
+}
+.problem-stat-text { font-size: 14px; color: var(--off); letter-spacing: 1px; margin-top: 4px; }
+
+.problem-list { display: flex; flex-direction: column; gap: 18px; }
+
+.problem-item {
+  display: flex; align-items: flex-start; gap: 18px;
+  padding: 18px 20px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--red);
+  transition: background 0.2s;
+}
+.problem-item:hover { background: var(--bg4); }
+
+.pi-num {
+  font-family: 'Bebas Neue'; font-size: 22px;
+  color: rgba(196,0,0,0.25); line-height: 1; flex-shrink: 0;
+}
+.pi-content {}
+.pi-title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+.pi-desc  { font-size: 13px; color: var(--off); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════
+   SOLUTION / PHASES
+═══════════════════════════════════════════════ */
+.section-solution { background: var(--bg); position: relative; }
+.solution-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 60% 50%, rgba(196,0,0,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.phase-stack { display: flex; flex-direction: column; gap: 1px; margin-top: 3rem; }
+
+.phase-card {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: stretch;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  transition: border-color 0.3s, background 0.3s;
+  overflow: hidden;
+  cursor: default;
+}
+.phase-card:hover { border-color: var(--line-red); background: var(--bg3); }
+
+.phase-num-col {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem 0;
+  background: var(--bg3);
+  border-right: 1px solid var(--line);
+}
+.phase-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--red-dark);
+  background: var(--bg);
+  margin-bottom: 0.6rem;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.phase-card:hover .phase-dot { background: var(--red); border-color: var(--red); box-shadow: 0 0 10px rgba(196,0,0,0.6); }
+.phase-big-num {
+  font-family: 'Bebas Neue'; font-size: 2.8rem;
+  color: rgba(196,0,0,0.12); letter-spacing: 0.05em;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.phase-card:hover .phase-big-num { color: rgba(196,0,0,0.35); }
+
+.phase-body { padding: 2.5rem 3rem; }
+.phase-label { font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 0.5rem; }
+.phase-title { font-family: 'Bebas Neue'; font-size: 2rem; letter-spacing: 0.08em; margin-bottom: 0.8rem; transition: color 0.3s; }
+.phase-card:hover .phase-title { color: var(--red); }
+.phase-desc { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.55); max-width: 600px; margin-bottom: 1.2rem; }
+.phase-desc strong { color: var(--white); }
+.phase-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill {
+  font-family: 'JetBrains Mono'; font-size: 0.58rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--red); background: var(--red-soft);
+  border: 1px solid var(--line-red);
+  padding: 3px 10px;
+  transition: background 0.2s;
+}
+.phase-card:hover .pill { background: rgba(196,0,0,0.12); }
+.phase-icon-big {
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 2rem;
+  font-size: 3rem;
+  opacity: 0.07;
+  border-left: 1px solid var(--line);
+  transition: opacity 0.3s;
+}
+.phase-card:hover .phase-icon-big { opacity: 0.15; }
+
+/* ═══════════════════════════════════════════════
+   PROOF OF PLAY
+═══════════════════════════════════════════════ */
+.section-pop { background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* BTC vs RWG comparison */
+.vs-grid {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--line);
+  margin-bottom: 5rem;
+}
+.vs-card { background: var(--bg3); padding: 2.5rem; }
+.vs-card.rwg { background: linear-gradient(135deg, rgba(196,0,0,0.06) 0%, var(--bg3) 60%); border-left: 2px solid var(--red); }
+
+.vs-header { display: flex; align-items: center; gap: 1rem; padding-bottom: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+.vs-name { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.1em; }
+.vs-name.btc { color: #F7931A; }
+.vs-name.rwg { color: var(--red); }
+.vs-sub { font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--dim); text-transform: uppercase; margin-top: 0.2rem; }
+
+.vs-row { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+.vs-row:last-child { border-bottom: none; }
+.vs-key { color: var(--off); font-size: 13px; }
+.vs-val { color: var(--white); font-weight: 600; text-align: right; }
+.vs-val.red { color: var(--red); }
+
+.vs-mid {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.vs-text { font-family: 'Bebas Neue'; font-size: 1.1rem; color: var(--dim); letter-spacing: 0.12em; }
+
+/* Mining flow steps */
+.flow-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 2rem;
+}
+.flow-step {
+  background: var(--bg2);
+  padding: 1.8rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.flow-step:hover { background: var(--bg3); }
+.flow-step::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--red);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s;
+}
+.flow-step:hover::before { transform: scaleX(1); }
+.fs-num { font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--red); margin-bottom: 0.8rem; text-transform: uppercase; }
+.fs-title { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.fs-desc { font-size: 12px; color: var(--off); line-height: 1.6; }
+.fs-big { position: absolute; bottom: 0; right: 0.5rem; font-family: 'Bebas Neue'; font-size: 5rem; color: rgba(196,0,0,0.04); line-height: 1; }
+
+/* Community cards */
+.community-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 2.5rem; }
+.com-card { background: var(--bg2); padding: 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; }
+.com-card:hover { background: var(--bg3); }
+.com-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); }
+.com-card:hover::before { transform: scaleX(1); }
+.com-step { font-family: 'JetBrains Mono'; font-size: 0.58rem; letter-spacing: 0.18em; color: var(--red); text-transform: uppercase; margin-bottom: 1rem; }
+.com-icon { font-size: 2rem; margin-bottom: 0.8rem; display: block; }
+.com-title { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+.com-text { font-size: 13px; line-height: 1.8; color: var(--off); }
+.com-watermark { position: absolute; bottom: 0; right: 0.5rem; font-family: 'Bebas Neue'; font-size: 7rem; color: rgba(196,0,0,0.03); line-height: 1; }
+
+/* ═══════════════════════════════════════════════
+   PRODUCT SECTIONS
+═══════════════════════════════════════════════ */
+.section-product { border-top: 1px solid var(--line); }
+.section-product:nth-of-type(odd)  { background: var(--bg); }
+.section-product:nth-of-type(even) { background: var(--bg2); }
+
+.product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.product-layout.rev { }
+.product-layout.rev .product-text { order: 2; }
+.product-layout.rev .product-preview { order: 1; }
+
+.product-phase { font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--red); text-transform: uppercase; margin-bottom: 12px; }
+
+.feature-list { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+.feature-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 500; transition: color 0.2s; }
+.feature-item::before { content: ''; width: 5px; height: 5px; background: var(--red); flex-shrink: 0; clip-path: polygon(50% 0,100% 100%,0 100%); }
+.feature-item:hover { color: var(--white); }
+
+/* UI Mocks */
+.ui-mock {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.ui-mock:hover { border-color: rgba(196,0,0,0.25); box-shadow: 0 0 40px rgba(196,0,0,0.05); }
+.ui-bar { height: 34px; background: var(--bg4); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 14px; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.r { background: var(--red); }
+.dot.y { background: #888; }
+.dot.g { background: #2a9d2a; }
+.ui-body { padding: 18px; }
+
+.store-game-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.sg { flex: 1; height: 78px; background: var(--bg4); border: 1px solid var(--line); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.store-list-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.sl-name { font-size: 12px; font-weight: 600; }
+.sl-price { font-size: 11px; color: var(--red); font-family: 'JetBrains Mono'; }
+.sl-btn { font-size: 10px; background: var(--red); color: white; padding: 3px 10px; border: none; cursor: pointer; }
+
+.mining-bar-mock { background: var(--bg4); border: 1px solid var(--line); padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border-radius: 3px; }
+.mining-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; animation: pulseG 1.5s ease-in-out infinite; }
+@keyframes pulseG { 0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,0.5);} 50%{box-shadow:0 0 0 6px rgba(0,230,118,0);} }
+.mock-bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.mock-bar-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ff6666); border-radius: 2px; }
+
+/* Block mock */
+.block-chain-mock { display: flex; flex-direction: column; gap: 6px; }
+.block-item { background: var(--bg3); border: 1px solid var(--line); padding: 10px 14px; display: grid; grid-template-columns: 82px 1fr 82px 60px; align-items: center; gap: 10px; font-size: 12px; transition: border-color 0.2s; }
+.block-item:first-child { border-left: 2px solid var(--red); animation: newBlock 0.8s ease; }
+.block-item:hover { border-color: rgba(196,0,0,0.2); }
+@keyframes newBlock { 0%{background:rgba(196,0,0,0.07);} 100%{background:var(--bg3);} }
+.bm-num { font-family: 'JetBrains Mono'; color: var(--red); font-weight: 600; }
+.bm-player { font-weight: 600; }
+.bm-game { color: var(--off); font-size: 11px; }
+.bm-reward { color: var(--red); font-family: 'Bebas Neue'; font-size: 16px; letter-spacing: 1px; text-align: right; }
+
+/* ═══════════════════════════════════════════════
+   TOKENOMICS
+═══════════════════════════════════════════════ */
+.section-tokenomics { background: var(--bg); border-top: 1px solid var(--line); }
+.token-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 3rem; }
+.token-card { background: var(--bg2); padding: 2.5rem 2rem; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+.token-card:hover { background: var(--bg3); }
+.token-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 50%; height: 2px; background: var(--red); transition: right 0.4s; }
+.token-card:hover::after { right: 0; }
+.token-val { font-family: 'Bebas Neue'; font-size: 42px; color: var(--red); letter-spacing: 2px; line-height: 1; margin-bottom: 6px; }
+.token-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--off); text-transform: uppercase; }
+
+.token-philosophy {
+  margin-top: 3rem;
+  padding: 2rem 2.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--red);
+  max-width: 680px;
+}
+.tp-label { font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }
+.tp-text { font-family: 'Bebas Neue'; font-size: 24px; letter-spacing: 2px; line-height: 1.25; color: var(--white); }
+
+/* ═══════════════════════════════════════════════
+   BLOCKCHAIN
+═══════════════════════════════════════════════ */
+.section-chain { background: var(--bg2); border-top: 1px solid var(--line); }
+.chain-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.chain-features { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+.chain-feat {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--red);
+  transition: all 0.2s;
+}
+.chain-feat:hover { border-left-color: var(--white); background: var(--bg4); }
+.cf-icon { font-size: 18px; flex-shrink: 0; }
+.cf-title { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px; }
+.cf-desc { font-size: 12px; color: var(--off); line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════
+   FOUNDER / VISION
+═══════════════════════════════════════════════ */
+.section-founder { background: var(--bg); border-top: 1px solid var(--line); }
+.founder-layout { display: grid; grid-template-columns: 1fr 360px; gap: 80px; align-items: start; }
+blockquote {
+  font-family: 'Bebas Neue';
+  font-size: clamp(30px,5vw,58px);
+  letter-spacing: 2px; line-height: 1.05;
+  color: var(--white);
+  border-left: 3px solid var(--red);
+  padding-left: 24px;
+  margin-bottom: 28px;
+}
+blockquote .red { color: var(--red); }
+
+.founder-card { background: var(--bg2); border: 1px solid var(--line); border-top: 2px solid var(--red); padding: 28px; }
+.founder-name { font-family: 'Bebas Neue'; font-size: 26px; letter-spacing: 2px; margin-bottom: 4px; }
+.founder-title { font-size: 12px; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-family: 'JetBrains Mono'; }
+.founder-bio { font-size: 14px; color: var(--off); line-height: 1.7; }
+.founder-links { display: flex; flex-direction: column; gap: 0; margin-top: 18px; }
+.founder-link { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--off); text-decoration: none; transition: color 0.2s, padding-left 0.2s; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.founder-link:hover { color: var(--white); padding-left: 6px; }
+.founder-link:last-child { border-bottom: none; }
+
+/* ═══════════════════════════════════════════════
+   SOCIAL
+═══════════════════════════════════════════════ */
+.section-social { background: var(--bg2); border-top: 1px solid var(--line); }
+.social-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 3rem; }
+.social-card { display: flex; align-items: center; gap: 14px; padding: 18px 24px; background: var(--bg3); border: 1px solid var(--line); text-decoration: none; color: var(--white); transition: all 0.3s; min-width: 190px; font-family: 'Rajdhani'; font-weight: 600; font-size: 14px; }
+.social-card:hover { border-color: var(--line-red); background: var(--red-soft); }
+.social-icon { font-size: 20px; }
+.social-platform { font-size: 11px; color: var(--off); text-transform: uppercase; letter-spacing: 2px; display: block; }
+.social-handle { font-size: 14px; font-weight: 700; color: var(--white); display: block; }
+
+/* ═══════════════════════════════════════════════
+   INVESTOR CTA
+═══════════════════════════════════════════════ */
+.section-invest {
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  text-align: center;
+  padding: 120px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.invest-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(196,0,0,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.invest-grid-lines {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(196,0,0,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(196,0,0,0.04) 1px,transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+.invest-section-label { font-family: 'JetBrains Mono'; font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--red); display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin-bottom: 1.5rem; }
+.invest-section-label::before { content: '//'; color: var(--red-dark); }
+.invest-section-label::after { content: '//'; color: var(--red-dark); }
+.invest-h2 { font-family: 'Bebas Neue'; font-size: clamp(40px,7vw,80px); letter-spacing: 4px; line-height: 0.95; margin: 0 auto 1rem; }
+.invest-h2 .red { color: var(--red); }
+.invest-rule { width: 60px; height: 2px; background: var(--red); margin: 1.5rem auto; }
+.invest-desc { font-size: 16px; color: rgba(255,255,255,0.55); max-width: 560px; margin: 0 auto 1rem; line-height: 1.85; }
+.invest-desc strong { color: var(--white); font-weight: 600; }
+.invest-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem; }
+.invest-contact {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--bg2); border: 1px solid var(--line);
+  padding: 14px 28px; margin-top: 2rem;
+  font-family: 'JetBrains Mono'; font-size: 0.8rem;
+  letter-spacing: 0.1em; color: var(--off);
+}
+.invest-contact::before { content: 'EMAIL'; font-size: 0.58rem; color: var(--dim); letter-spacing: 0.2em; }
+.invest-contact a { color: var(--red); text-decoration: none; transition: color 0.2s; }
+.invest-contact a:hover { color: var(--white); }
+
+/* ═══════════════════════════════════════════════
+   FINAL STATEMENT
+═══════════════════════════════════════════════ */
+.section-final {
+  background: var(--bg);
+  min-height: 70vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 40px;
+  border-top: 1px solid var(--line-red);
+  position: relative; overflow: hidden;
+}
+.final-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(196,0,0,0.06) 0%, transparent 60%); pointer-events: none; }
+.final-not { font-family: 'Bebas Neue'; font-size: clamp(24px,5vw,60px); letter-spacing: 5px; color: rgba(255,255,255,0.12); text-decoration: line-through; text-decoration-color: rgba(196,0,0,0.4); margin-bottom: 12px; }
+.final-main { font-family: 'Bebas Neue'; font-size: clamp(52px,11vw,140px); letter-spacing: 6px; line-height: 0.9; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 50%, rgba(196,0,0,0.8) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 40px; }
+.final-join { height: 58px; padding: 0 60px; background: var(--red); border: none; color: white; font-family: 'Rajdhani'; font-weight: 700; font-size: 15px; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; clip-path: polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%); }
+.final-join::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transform: translateX(-100%); transition: transform 0.5s; }
+.final-join:hover { background: #a00; box-shadow: 0 0 30px rgba(196,0,0,0.5); }
+.final-join:hover::before { transform: translateX(100%); }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--line);
+  padding: 28px 80px;
+}
+.footer-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.footer-brand { font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 3px; color: var(--off); }
+.footer-brand span { color: var(--red); }
+.footer-nav { display: flex; gap: 4px; list-style: none; flex-wrap: wrap; }
+.footer-nav a { font-family: 'Rajdhani'; font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); text-decoration: none; padding: 4px 10px; transition: color 0.2s; }
+.footer-nav a:hover { color: var(--red); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.footer-copy { font-size: 12px; color: var(--dim); letter-spacing: 0.5px; }
+.footer-email { font-family: 'JetBrains Mono'; font-size: 11px; color: rgba(196,0,0,0.5); letter-spacing: 0.05em; }
+.footer-tagline { font-family: 'Bebas Neue'; font-size: 14px; letter-spacing: 0.2em; color: var(--dim); }
+.footer-tagline span { color: var(--red); }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  section { padding: 70px 24px; }
+  .section-number { right: 24px; font-size: 70px; }
+  .hero-content { padding: 0 24px; }
+  .hero-stats { left: 24px; gap: 24px; }
+
+  .nav-center { display: none; }
+  .nav-right { display: none; }
+  .hamburger { display: flex; margin-left: auto; }
+
+  .product-layout { grid-template-columns: 1fr; }
+  .product-layout.rev .product-text { order: 1; }
+  .product-layout.rev .product-preview { order: 2; }
+
+  .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+  .chain-visual { grid-template-columns: 1fr; gap: 40px; }
+  .founder-layout { grid-template-columns: 1fr; gap: 40px; }
+  .token-grid { grid-template-columns: repeat(2,1fr); }
+
+  .vs-grid { grid-template-columns: 1fr; }
+  .vs-mid { padding: 16px; }
+
+  .flow-steps { grid-template-columns: 1fr 1fr; }
+  .community-grid { grid-template-columns: 1fr; }
+
+  .phase-card { grid-template-columns: 70px 1fr; }
+  .phase-icon-big { display: none; }
+  .phase-body { padding: 1.8rem 1.5rem; }
+
+  footer { padding: 24px; }
+  .footer-top { flex-direction: column; align-items: flex-start; }
+  .footer-nav { display: none; }
+
+  .section-invest { padding: 80px 24px; }
+  .invest-btns { flex-direction: column; align-items: center; }
+  .invest-btns .btn-primary, .invest-btns .btn-outline { width: 100%; text-align: center; clip-path: none; }
+}
+
+@media (max-width: 580px) {
+  h2 { font-size: 2.2rem; }
+  .hero-title { font-size: 14vw; }
+  .hero-stats { display: none; }
+  .flow-steps { grid-template-columns: 1fr; }
+  .token-grid { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- CURSORS -->
+<div class="cursor"     id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ═══════════════════════════════════════════
+     CINEMATIC INTRO
+═══════════════════════════════════════════ -->
+<div id="intro">
+  <canvas id="rain-canvas"></canvas>
+
+  <!-- Skip button — works on all devices -->
+  <button class="skip-btn" id="skipBtn" onclick="skipIntro()">SKIP ✕</button>
+
+  <!-- City silhouette -->
+  <div class="city-layer" id="cityLayer">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,400 L0,320 L40,320 L40,260 L60,260 L60,200 L80,200 L80,160 L100,160 L100,140 L120,140 L120,100 L130,100 L130,80 L150,80 L150,60 L165,60 L165,80 L175,80 L175,100 L185,100 L185,160 L200,160 L200,200 L220,200 L220,240 L240,240 L240,220 L260,220 L260,180 L280,180 L280,140 L290,140 L290,120 L310,120 L310,100 L320,100 L320,80 L330,80 L330,60 L345,60 L345,80 L360,80 L360,100 L370,100 L370,120 L390,120 L390,160 L410,160 L410,200 L430,200 L430,240 L450,240 L450,280 L480,280 L480,260 L500,260 L500,220 L520,220 L520,180 L530,180 L530,160 L550,160 L550,120 L560,120 L560,100 L575,100 L575,80 L590,80 L590,60 L605,60 L605,80 L620,80 L620,100 L630,100 L630,120 L640,120 L640,150 L660,150 L660,180 L680,180 L680,220 L700,220 L700,260 L720,260 L720,300 L740,300 L740,280 L760,280 L760,240 L780,240 L780,200 L790,200 L790,170 L810,170 L810,140 L820,140 L820,110 L835,110 L835,90 L850,90 L850,70 L865,70 L865,90 L875,90 L875,110 L890,110 L890,140 L910,140 L910,170 L930,170 L930,200 L950,200 L950,240 L970,240 L970,280 L990,280 L990,310 L1010,310 L1010,290 L1030,290 L1030,250 L1050,250 L1050,210 L1060,210 L1060,180 L1080,180 L1080,150 L1090,150 L1090,130 L1110,130 L1110,110 L1120,110 L1120,90 L1135,90 L1135,70 L1150,70 L1150,90 L1160,90 L1160,110 L1175,110 L1175,130 L1195,130 L1195,160 L1215,160 L1215,200 L1235,200 L1235,240 L1260,240 L1260,280 L1290,280 L1290,310 L1320,310 L1320,290 L1350,290 L1350,260 L1380,260 L1380,300 L1410,300 L1410,320 L1440,320 L1440,400 Z" fill="#080808"/>
+    </svg>
+    <div class="fog-layer"></div>
+  </div>
+
+  <!-- City lights -->
+  <div class="city-lights" id="cityLights"></div>
+
+  <!-- Vehicles -->
+  <div class="vehicles-layer" id="vehiclesLayer">
+    <div class="moto">
+      <div class="moto-wheel"></div>
+      <div class="moto-body"></div>
+      <div class="moto-wheel"></div>
+    </div>
+    <div class="heli-light"></div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div id="introStep1">
+    <div class="intro-brand" id="introBrand">REAL WORLD GAMING</div>
+    <div class="intro-sub-text" id="introProof">Proof of Play Protocol</div>
+    <div class="intro-tagline" id="introSub">Play · Own · Earn</div>
+  </div>
+
+  <!-- Phase 2 — Logo -->
+  <div class="logo-reveal" id="logoReveal">
+    <div class="logo-mark-wrap">
+      <div class="logo-glow"></div>
+      <div class="logo-particles" id="logoParts"></div>
+      <div class="logo-text-xl">RW<span>G</span></div>
+    </div>
+    <div class="tagline-reveal" id="taglineReveal">Real World Gaming</div>
+    <button class="enter-btn" id="enterBtn">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN WEBSITE
+═══════════════════════════════════════════ -->
+<div id="website">
+
+  <!-- NAV -->
+  <nav id="mainNav">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-mark">R</div>
+      <span class="nav-logo-text">RWG</span>
+    </a>
+    <div class="nav-center">
+      <a class="nav-link" href="#problem">Problem</a>
+      <a class="nav-link" href="#solution">Phases</a>
+      <a class="nav-link" href="#pop">Mining</a>
+      <a class="nav-link" href="#tokenomics">Token</a>
+      <a class="nav-link" href="#chain">Chain</a>
+      <a class="nav-link" href="#why">Vision</a>
+    </div>
+    <div class="nav-right">
+      <a class="nav-cta" href="#invest">Invest</a>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#problem"    onclick="closeMenu()">Problem</a>
+    <a href="#solution"   onclick="closeMenu()">Phases</a>
+    <a href="#pop"        onclick="closeMenu()">Proof of Play</a>
+    <a href="#tokenomics" onclick="closeMenu()">Tokenomics</a>
+    <a href="#chain"      onclick="closeMenu()">Blockchain</a>
+    <a href="#why"        onclick="closeMenu()">Vision</a>
+    <a href="#invest" class="m-cta" onclick="closeMenu()">Invest in RWG</a>
+    <a href="mailto:skjainuddin12345@gmail.com" class="m-invest" onclick="closeMenu()">skjainuddin12345@gmail.com</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="heroCityCanvas"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Pre-Seed Round · Now Open</div>
+      <h1 class="hero-title">
+        REAL <span class="red">WORLD</span>
+        <span class="stroke">GAMING</span>
+      </h1>
+      <div class="hero-line"></div>
+      <p class="hero-desc">
+        The world's first <strong>Proof-of-Play ecosystem</strong> — where gameplay replaces hardware in the mining equation. <strong>Play. Own. Earn.</strong> Finally, the economy works for the gamer.
+      </p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="document.getElementById('invest').scrollIntoView({behavior:'smooth'})">Request Investor Deck</button>
+        <button class="btn-outline" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">Explore Ecosystem →</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat"><div class="h-stat-val">3.2B</div><div class="h-stat-key">Global Gamers</div></div>
+      <div class="h-stat"><div class="h-stat-val">$200B</div><div class="h-stat-key">Gaming Market</div></div>
+      <div class="h-stat"><div class="h-stat-val">786M</div><div class="h-stat-key">RWG Supply</div></div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-label">RWG</div>
+    <div class="ticker-track">
+      <div class="ticker-inner">
+        <span>RWG Store</span><span class="sep">◆</span>
+        <span>Proof of Play</span><span class="sep">◆</span>
+        <span>RWG Launcher</span><span class="sep">◆</span>
+        <span>Community Mining</span><span class="sep">◆</span>
+        <span>True Ownership</span><span class="sep">◆</span>
+        <span>RWG Studio</span><span class="sep">◆</span>
+        <span>Play. Own. Earn.</span><span class="sep">◆</span>
+        <span>786M Token Supply</span><span class="sep">◆</span>
+        <span>3-Year Halving</span><span class="sep">◆</span>
+        <span>100-Year Mining</span><span class="sep">◆</span>
+        <span>RWG Store</span><span class="sep">◆</span>
+        <span>Proof of Play</span><span class="sep">◆</span>
+        <span>RWG Launcher</span><span class="sep">◆</span>
+        <span>Community Mining</span><span class="sep">◆</span>
+        <span>True Ownership</span><span class="sep">◆</span>
+        <span>RWG Studio</span><span class="sep">◆</span>
+        <span>Play. Own. Earn.</span><span class="sep">◆</span>
+        <span>786M Token Supply</span><span class="sep">◆</span>
+        <span>3-Year Halving</span><span class="sep">◆</span>
+        <span>100-Year Mining</span><span class="sep">◆</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="section-problem" id="problem">
+    <div class="section-number">01</div>
+    <div class="problem-grid">
+      <div class="fade-in">
+        <div class="eyebrow">The Problem</div>
+        <h2>Gamers Give <span class="red">Everything.</span><br>Get Nothing Back.</h2>
+        <div class="section-line"></div>
+        <p class="large">The gaming industry takes <strong>$200B+ annually</strong> from 3.2 billion players who contribute billions of hours and receive zero economic return. <strong>RWG ends that.</strong></p>
+        <div class="problem-numbers" style="margin-top:32px;">
+          <div class="problem-stat">
+            <div class="problem-stat-num">$200B+</div>
+            <div class="problem-stat-text">Annual revenue from players — 0% returned</div>
+          </div>
+          <div class="problem-stat">
+            <div class="problem-stat-num">8B hrs</div>
+            <div class="problem-stat-text">Hours played daily — completely unrewarded</div>
+          </div>
+          <div class="problem-stat">
+            <div class="problem-stat-num">3.2B</div>
+            <div class="problem-stat-text">Gamers who own nothing they've purchased</div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-in delay-2">
+        <div class="problem-list">
+          <div class="problem-item">
+            <div class="pi-num">01</div>
+            <div class="pi-content">
+              <div class="pi-title">No Ownership</div>
+              <div class="pi-desc">Players buy licenses, not games. Platforms revoke access anytime. Every dollar spent can vanish overnight without warning.</div>
+            </div>
+          </div>
+          <div class="problem-item">
+            <div class="pi-num">02</div>
+            <div class="pi-content">
+              <div class="pi-title">No Rewards</div>
+              <div class="pi-desc">8 billion gaming hours played every day. Zero economic return. Gamers power a $200B industry and keep absolutely nothing.</div>
+            </div>
+          </div>
+          <div class="problem-item">
+            <div class="pi-num">03</div>
+            <div class="pi-content">
+              <div class="pi-title">Winner Takes All</div>
+              <div class="pi-desc">Existing play-to-earn models reward only top players. 99% of participants earn nothing and eventually leave entirely.</div>
+            </div>
+          </div>
+          <div class="problem-item">
+            <div class="pi-num">04</div>
+            <div class="pi-content">
+              <div class="pi-title">Total Centralization</div>
+              <div class="pi-desc">A handful of mega-platforms control everything. Developers, players and assets are all locked into ecosystems they don't own.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION / THREE PHASES -->
+  <section class="section-solution" id="solution">
+    <div class="solution-glow"></div>
+    <div class="section-number">02</div>
+    <div class="fade-in">
+      <div class="eyebrow">The Ecosystem</div>
+      <h2>Three Phases. <span class="red">One</span> Economy.</h2>
+      <div class="section-line"></div>
+      <p class="large">Each phase generates the revenue and community to fund the next. <strong>No overpromising. No shortcuts.</strong> Just a logical path from marketplace to global studio.</p>
+    </div>
+
+    <div class="phase-stack" style="margin-top:3rem;">
+      <div class="phase-card fade-in">
+        <div class="phase-num-col">
+          <div class="phase-dot"></div>
+          <div class="phase-big-num">01</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-label">// Phase One</div>
+          <div class="phase-title">RWG STORE</div>
+          <p class="phase-desc">A blockchain-powered game marketplace where players buy games with <strong>crypto or fiat</strong>. True on-chain ownership — your library is yours forever, no platform can revoke it. Every game has its own dedicated <strong>community space</strong>. RWG token holders receive automatic purchase discounts. External studios publish directly.</p>
+          <div class="phase-pills">
+            <span class="pill">Crypto + Fiat</span>
+            <span class="pill">True Ownership</span>
+            <span class="pill">Game Communities</span>
+            <span class="pill">RWG Discounts</span>
+            <span class="pill">Dev Publishing</span>
+          </div>
+        </div>
+        <div class="phase-icon-big">🏪</div>
+      </div>
+
+      <div class="phase-card fade-in delay-1">
+        <div class="phase-num-col">
+          <div class="phase-dot"></div>
+          <div class="phase-big-num">02</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-label">// Phase Two</div>
+          <div class="phase-title">RWG LAUNCHER</div>
+          <p class="phase-desc">The <strong>mining engine of RWG</strong>. The Launcher tracks gameplay across supported titles, verifies real players through AI, and distributes RWG tokens based on skill and activity. <strong>RWG Store buyers get free access</strong>. External gamers pay a monthly subscription. Games are added progressively — each one expanding the Proof-of-Play mining ecosystem.</p>
+          <div class="phase-pills">
+            <span class="pill">Free for Store Users</span>
+            <span class="pill">AI Verification</span>
+            <span class="pill">Token Rewards</span>
+            <span class="pill">Multi-Game Mining</span>
+            <span class="pill">Community Pools</span>
+          </div>
+        </div>
+        <div class="phase-icon-big">🚀</div>
+      </div>
+
+      <div class="phase-card fade-in delay-2">
+        <div class="phase-num-col">
+          <div class="phase-dot"></div>
+          <div class="phase-big-num">03</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-label">// Phase Three</div>
+          <div class="phase-title">RWG STUDIO</div>
+          <p class="phase-desc">The <strong>heart of RWG</strong>. Our in-house studio builds games that fully leverage the ecosystem — on-chain assets, 100-player lobbies, personal player spaces where communities socialize, trade and manage portfolios. Games built here set the global standard for blockchain-native gaming. <strong>RWG token is the sole payment layer</strong>.</p>
+          <div class="phase-pills">
+            <span class="pill">AAA Titles</span>
+            <span class="pill">100-Player Lobbies</span>
+            <span class="pill">NFT Economy</span>
+            <span class="pill">Personal Spaces</span>
+            <span class="pill">RWG Native</span>
+          </div>
+        </div>
+        <div class="phase-icon-big">🎮</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF OF PLAY -->
+  <section class="section-pop" id="pop">
+    <div class="section-number">03</div>
+    <div class="fade-in">
+      <div class="eyebrow">Proof of Play Protocol</div>
+      <h2>Bitcoin Mines With <span class="red">Hardware.</span><br>RWG Mines With <span class="stroke">Skill.</span></h2>
+      <div class="section-line"></div>
+      <p class="large">The <strong>Proof-of-Play protocol</strong> replaces electricity and ASICs with gameplay and skill — making token mining accessible to any gamer on any device, with zero hardware cost.</p>
+    </div>
+
+    <div class="vs-grid fade-in" style="margin-top:3rem;">
+      <div class="vs-card">
+        <div class="vs-header">
+          <div>
+            <div class="vs-name btc">BITCOIN</div>
+            <div class="vs-sub">Proof-of-Work</div>
+          </div>
+        </div>
+        <div class="vs-row"><span class="vs-key">Mining Method</span><span class="vs-val">Electricity + ASICs</span></div>
+        <div class="vs-row"><span class="vs-key">Entry Barrier</span><span class="vs-val">High — expensive hardware</span></div>
+        <div class="vs-row"><span class="vs-key">Energy Cost</span><span class="vs-val">Extremely High</span></div>
+        <div class="vs-row"><span class="vs-key">Who Can Mine?</span><span class="vs-val">Specialists only</span></div>
+        <div class="vs-row"><span class="vs-key">Halving Cycle</span><span class="vs-val">Every 4 years</span></div>
+        <div class="vs-row"><span class="vs-key">Total Supply</span><span class="vs-val">21,000,000 BTC</span></div>
+        <div class="vs-row"><span class="vs-key">Fun Factor</span><span class="vs-val">None</span></div>
+      </div>
+      <div class="vs-mid"><div class="vs-text">VS</div></div>
+      <div class="vs-card rwg">
+        <div class="vs-header">
+          <div>
+            <div class="vs-name rwg">REAL WORLD GAMING</div>
+            <div class="vs-sub">Proof-of-Play</div>
+          </div>
+        </div>
+        <div class="vs-row"><span class="vs-key">Mining Method</span><span class="vs-val red">Gameplay + Skill</span></div>
+        <div class="vs-row"><span class="vs-key">Entry Barrier</span><span class="vs-val red">Zero — just play</span></div>
+        <div class="vs-row"><span class="vs-key">Energy Cost</span><span class="vs-val red">None additional</span></div>
+        <div class="vs-row"><span class="vs-key">Who Can Mine?</span><span class="vs-val red">Any gamer, any device</span></div>
+        <div class="vs-row"><span class="vs-key">Halving Cycle</span><span class="vs-val red">Every 3 years</span></div>
+        <div class="vs-row"><span class="vs-key">Total Supply</span><span class="vs-val red">786,000,000 RWG</span></div>
+        <div class="vs-row"><span class="vs-key">Fun Factor</span><span class="vs-val red">That's the whole point.</span></div>
+      </div>
+    </div>
+
+    <!-- Mining Flow -->
+    <div class="fade-in" style="margin-top:3.5rem;">
+      <div class="eyebrow">Mining Flow</div>
+      <h2>How <span class="red">PoP</span> Works</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="flow-steps fade-in delay-1">
+      <div class="flow-step"><div class="fs-num">// 01</div><div class="fs-title">PLAY</div><div class="fs-desc">Player engages in any supported game through the RWG Launcher.</div><div class="fs-big">1</div></div>
+      <div class="flow-step"><div class="fs-num">// 02</div><div class="fs-title">TRACK</div><div class="fs-desc">Launcher monitors activity in real-time — sessions, matches, performance.</div><div class="fs-big">2</div></div>
+      <div class="flow-step"><div class="fs-num">// 03</div><div class="fs-title">VERIFY</div><div class="fs-desc">AI anti-cheat confirms real human activity. Bots and exploits are rejected.</div><div class="fs-big">3</div></div>
+      <div class="flow-step"><div class="fs-num">// 04</div><div class="fs-title">CALCULATE</div><div class="fs-desc">Reward computed from activity, performance, wins and community contribution.</div><div class="fs-big">4</div></div>
+      <div class="flow-step" style="background:rgba(196,0,0,0.06); border-left:2px solid var(--red);"><div class="fs-num">// 05</div><div class="fs-title" style="color:var(--red);">EARN</div><div class="fs-desc">RWG tokens distributed to player wallet at the end of each mining block.</div><div class="fs-big">5</div></div>
+    </div>
+
+    <!-- Community Mining -->
+    <div class="fade-in" style="margin-top:4rem;">
+      <div class="eyebrow">Community Mining</div>
+      <h2>Better Together. <span class="red">Win</span> Together.</h2>
+      <div class="section-line"></div>
+      <p class="large">Just like Bitcoin miners form pools — RWG players form <strong>communities to pool gameplay</strong>. Every member contributes. <strong>Skill decides individual reward</strong>. Simple. Fair.</p>
+    </div>
+    <div class="community-grid">
+      <div class="com-card fade-in">
+        <div class="com-step">// Step 01</div>
+        <span class="com-icon">👥</span>
+        <div class="com-title">FORM A COMMUNITY</div>
+        <p class="com-text">Players group together like mining pools — built on team loyalty, shared game strategy and competitive drive rather than hardware specs.</p>
+        <div class="com-watermark">1</div>
+      </div>
+      <div class="com-card fade-in delay-1">
+        <div class="com-step">// Step 02</div>
+        <span class="com-icon">⚔️</span>
+        <div class="com-title">COMPETE TOGETHER</div>
+        <p class="com-text">Communities pool combined gameplay activity. Every member contributes — even average players strengthen the community and increase collective rewards.</p>
+        <div class="com-watermark">2</div>
+      </div>
+      <div class="com-card fade-in delay-2">
+        <div class="com-step">// Step 03</div>
+        <span class="com-icon">🏅</span>
+        <div class="com-title">SKILL DECIDES ALL</div>
+        <p class="com-text">Inside the community, distribution is pure: the better you play, the more you earn. No votes, no committees — the game judges instantly and fairly.</p>
+        <div class="com-watermark">3</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORE PRODUCT -->
+  <section class="section-product" id="store">
+    <div class="section-number">04</div>
+    <div class="product-layout">
+      <div class="product-text fade-in">
+        <div class="product-phase">// Phase 01</div>
+        <div class="eyebrow">Marketplace</div>
+        <h2>RWG <span class="red">Store</span></h2>
+        <div class="section-line"></div>
+        <p class="large">A blockchain-powered gaming marketplace. Buy with crypto or fiat. <strong>True on-chain ownership</strong> — your library is permanent, transferable, and can never be taken away.</p>
+        <div class="feature-list">
+          <div class="feature-item">Buy games with crypto or fiat payments</div>
+          <div class="feature-item">True on-chain ownership — permanent library</div>
+          <div class="feature-item">Every game has its own community space</div>
+          <div class="feature-item">RWG token holders get automatic discounts</div>
+          <div class="feature-item">Developer publishing platform for studios</div>
+          <div class="feature-item">Asset marketplace — sell what you own</div>
+        </div>
+      </div>
+      <div class="product-preview fade-in delay-2">
+        <div class="ui-mock">
+          <div class="ui-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="font-size:11px;color:var(--off);margin-left:8px;font-family:'JetBrains Mono'">RWG Store v1.0</span></div>
+          <div class="ui-body">
+            <div class="store-game-row">
+              <div class="sg">🏙</div>
+              <div class="sg">⚔️</div>
+              <div class="sg">🚀</div>
+            </div>
+            <div class="store-list-row"><span class="sl-name">Metro Warfare</span><span class="sl-price">12 RWG</span><button class="sl-btn">BUY</button></div>
+            <div class="store-list-row"><span class="sl-name">Eternal Realms</span><span class="sl-price">18 RWG</span><button class="sl-btn">BUY</button></div>
+            <div class="store-list-row"><span class="sl-name">Void Frontier</span><span class="sl-price">8 RWG</span><button class="sl-btn">BUY</button></div>
+            <div style="margin-top:12px;padding:10px;background:rgba(196,0,0,0.06);border:1px solid var(--line-red);border-radius:3px;">
+              <div style="font-size:11px;color:var(--red);font-family:'JetBrains Mono';letter-spacing:1px;">RWG HOLDER DISCOUNT ACTIVE — 15% OFF</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAUNCHER PRODUCT -->
+  <section class="section-product" id="launcher">
+    <div class="section-number">05</div>
+    <div class="product-layout rev">
+      <div class="product-preview fade-in">
+        <div class="ui-mock">
+          <div class="ui-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="font-size:11px;color:var(--off);margin-left:8px;font-family:'JetBrains Mono'">RWG Launcher</span></div>
+          <div class="ui-body">
+            <div class="mining-bar-mock">
+              <div>
+                <div style="font-size:11px;font-weight:700;margin-bottom:4px;">⚡ Metro Warfare</div>
+                <div style="font-size:10px;color:var(--off);">Session: 47min · Kills: 18 · Rank #4</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="mining-dot" style="margin-left:auto;margin-bottom:4px;"></div>
+                <div style="font-family:'Bebas Neue';font-size:18px;color:var(--red);">3.2 RWG</div>
+              </div>
+            </div>
+            <div class="mock-bar"><div class="mock-bar-fill" style="width:68%;"></div></div>
+            <div style="font-size:10px;color:var(--off);margin-top:4px;margin-bottom:12px;">Mining progress: 68% to next block</div>
+            <div class="mining-bar-mock" style="opacity:0.5;">
+              <div><div style="font-size:11px;font-weight:700;">⚔️ Eternal Realms</div><div style="font-size:10px;color:var(--off);">Idle</div></div>
+              <div style="font-family:'Bebas Neue';font-size:18px;color:var(--off);">0 RWG</div>
+            </div>
+            <div style="margin-top:12px;padding:8px 12px;background:rgba(196,0,0,0.06);border:1px solid var(--line-red);">
+              <div style="font-size:10px;color:var(--red);font-family:'JetBrains Mono';">STORE MEMBER · LAUNCHER ACCESS: FREE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-text fade-in delay-1">
+        <div class="product-phase">// Phase 02</div>
+        <div class="eyebrow">Mining Hub</div>
+        <h2>RWG <span class="red">Launcher</span></h2>
+        <div class="section-line"></div>
+        <p class="large">The <strong>Proof-of-Play engine</strong>. The Launcher is where tokens are mined — tracking gameplay, verifying real players via AI, and distributing rewards based on skill and activity.</p>
+        <div class="feature-list">
+          <div class="feature-item">Real-time gameplay activity tracking</div>
+          <div class="feature-item">AI anti-cheat — no bots, no exploits</div>
+          <div class="feature-item">Skill + activity based reward distribution</div>
+          <div class="feature-item">Free for all RWG Store members</div>
+          <div class="feature-item">Subscription access for external gamers</div>
+          <div class="feature-item">Multi-game support — growing library</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOCKCHAIN -->
+  <section class="section-chain" id="chain">
+    <div class="section-number">06</div>
+    <div class="chain-visual">
+      <div class="fade-in">
+        <div class="eyebrow">RWG Chain</div>
+        <h2>Gaming-First <span class="red">Layer 1</span></h2>
+        <div class="section-line"></div>
+        <p class="large">A blockchain built specifically for gaming. Fast blocks. Low fees. Every game action secured on-chain. <strong>Real ownership. Real economy.</strong></p>
+        <div class="chain-features">
+          <div class="chain-feat"><div class="cf-icon">⚡</div><div class="cf-content"><div class="cf-title">10 Second Block Time</div><div class="cf-desc">Near-instant transaction confirmation for seamless in-game experiences</div></div></div>
+          <div class="chain-feat"><div class="cf-icon">💎</div><div class="cf-content"><div class="cf-title">On-Chain Asset Ownership</div><div class="cf-desc">Every game item, skin and achievement stored immutably on-chain</div></div></div>
+          <div class="chain-feat"><div class="cf-icon">🔒</div><div class="cf-content"><div class="cf-title">Proof of Play Consensus</div><div class="cf-desc">The world's first gameplay-secured blockchain network</div></div></div>
+          <div class="chain-feat"><div class="cf-icon">🌐</div><div class="cf-content"><div class="cf-title">In-Game Economy Layer</div><div class="cf-desc">Trade assets, earn rewards and build wealth inside every game</div></div></div>
+        </div>
+      </div>
+      <div class="fade-in delay-2">
+        <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:2px;color:#00e676;text-transform:uppercase;font-family:'JetBrains Mono'">
+          <div style="width:6px;height:6px;background:#00e676;border-radius:50%;animation:pulseG 1.5s infinite;"></div>
+          Live Block Feed
+        </div>
+        <div class="block-chain-mock">
+          <div class="block-item"><div class="bm-num">#2,847,391</div><div class="bm-player">⚡ CryptoRaider</div><div class="bm-game">🏙 Metro Warfare</div><div class="bm-reward">3.2 RWG</div></div>
+          <div class="block-item"><div class="bm-num">#2,847,390</div><div class="bm-player">👑 ShadowFox99</div><div class="bm-game">🏆 Crown Protocol</div><div class="bm-reward">4.8 RWG</div></div>
+          <div class="block-item"><div class="bm-num">#2,847,389</div><div class="bm-player">🎯 NovaBlade</div><div class="bm-game">🔫 Bloodstrike</div><div class="bm-reward">2.1 RWG</div></div>
+          <div class="block-item"><div class="bm-num">#2,847,388</div><div class="bm-player">⚔️ DragonSlyr</div><div class="bm-game">⚔️ Eternal Realms</div><div class="bm-reward">5.4 RWG</div></div>
+          <div class="block-item"><div class="bm-num">#2,847,387</div><div class="bm-player">🌟 AceHunter</div><div class="bm-game">🚀 Void Frontier</div><div class="bm-reward">1.9 RWG</div></div>
+          <div class="block-item"><div class="bm-num">#2,847,386</div><div class="bm-player">🏎 SpeedDemon</div><div class="bm-game">🏎 Apex Circuit</div><div class="bm-reward">3.1 RWG</div></div>
+        </div>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--off);font-family:'JetBrains Mono';letter-spacing:1px;">Block time: 10s · 48,291 active miners</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKENOMICS -->
+  <section class="section-tokenomics" id="tokenomics">
+    <div class="section-number">07</div>
+    <div class="fade-in">
+      <div class="eyebrow">Token Economics</div>
+      <h2>RWG Token <span class="red">Economy</span></h2>
+      <div class="section-line"></div>
+      <p class="large">A deflationary token economy designed for the long game. <strong>786 million tokens. 100 years. Earned entirely through play.</strong></p>
+    </div>
+    <div class="token-grid">
+      <div class="token-card fade-in delay-1"><div class="token-val">786,000,000</div><div class="token-label">Total Supply</div></div>
+      <div class="token-card fade-in delay-2"><div class="token-val">100%</div><div class="token-label">Player Mined</div></div>
+      <div class="token-card fade-in delay-3"><div class="token-val">3 Years</div><div class="token-label">Halving Cycle</div></div>
+      <div class="token-card fade-in delay-4"><div class="token-val">100 Years</div><div class="token-label">Mining Duration</div></div>
+    </div>
+    <div class="token-philosophy fade-in delay-2">
+      <div class="tp-label">// The Philosophy</div>
+      <div class="tp-text">No founders allocation. No VC reserve. No pre-mine. Every single RWG token must be earned through real gameplay.</div>
+    </div>
+  </section>
+
+  <!-- FOUNDER / VISION -->
+  <section class="section-founder" id="why">
+    <div class="section-number">08</div>
+    <div class="founder-layout">
+      <div class="fade-in">
+        <div class="eyebrow">The Vision</div>
+        <blockquote>
+          I love gaming.<br>But games<br>
+          <span class="red">never reward</span><br>players.
+        </blockquote>
+        <p class="large">Millions of people pour their skill, time, and money into games. The industry takes everything and gives nothing back. That's the problem RWG exists to solve — permanently.</p>
+        <p class="large" style="margin-top:16px;"><strong>RWG rewards skill. RWG rewards time. Play and earn what you deserve.</strong></p>
+      </div>
+      <div class="fade-in delay-2">
+        <div class="founder-card">
+          <div class="founder-name">Shaik Jainuddin</div>
+          <div class="founder-title">Founder — Real World Gaming</div>
+          <div class="founder-bio">Building the ecosystem where gamers are finally recognized for the value they create. Every session. Every win. Every hour.</div>
+          <div class="founder-links">
+            <a class="founder-link" href="https://www.linkedin.com/in/shaikjainuddin" target="_blank"><span>💼</span><span>LinkedIn — Shaik Jainuddin</span></a>
+            <a class="founder-link" href="https://x.com/RWG__official" target="_blank"><span>✕</span><span>X — @RWG__official</span></a>
+            <a class="founder-link" href="https://discord.gg/ay9b9vU5b" target="_blank"><span>🎮</span><span>Discord Community</span></a>
+            <a class="founder-link" href="mailto:skjainuddin12345@gmail.com"><span>✉</span><span>skjainuddin12345@gmail.com</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL -->
+  <section class="section-social" id="social">
+    <div class="section-number">09</div>
+    <div style="text-align:center" class="fade-in">
+      <div class="eyebrow" style="justify-content:center;">Community</div>
+      <h2>Join The <span class="red">Movement</span></h2>
+      <div class="section-line" style="margin:18px auto 0;"></div>
+    </div>
+    <div class="social-row">
+      <a class="social-card fade-in delay-1" href="https://x.com/RWG__official" target="_blank">
+        <div class="social-icon">✕</div>
+        <div><span class="social-platform">X / Twitter</span><span class="social-handle">@RWG__official</span></div>
+      </a>
+      <a class="social-card fade-in delay-2" href="https://discord.gg/ay9b9vU5b" target="_blank">
+        <div class="social-icon">🎮</div>
+        <div><span class="social-platform">Discord</span><span class="social-handle">RWG Community</span></div>
+      </a>
+      <a class="social-card fade-in delay-3" href="https://www.linkedin.com/company/real-world-gaming/" target="_blank">
+        <div class="social-icon">💼</div>
+        <div><span class="social-platform">LinkedIn</span><span class="social-handle">Real World Gaming</span></div>
+      </a>
+      <a class="social-card fade-in delay-4" href="mailto:skjainuddin12345@gmail.com">
+        <div class="social-icon">✉</div>
+        <div><span class="social-platform">Email</span><span class="social-handle">skjainuddin12345@gmail.com</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- INVESTOR CTA -->
+  <section class="section-invest" id="invest">
+    <div class="invest-glow"></div>
+    <div class="invest-grid-lines"></div>
+    <div class="fade-in">
+      <div class="invest-section-label">Investment Opportunity</div>
+      <h2 class="invest-h2">The Gaming <span class="red">Infrastructure</span><br>Moment Is Now.</h2>
+      <div class="invest-rule"></div>
+      <p class="invest-desc">We are seeking <strong>strategic investors</strong> who understand that the convergence of gaming, blockchain ownership and player economics is a once-in-a-decade infrastructure opportunity.</p>
+      <p class="invest-desc" style="margin-top:0.5rem;"><strong>3.2 billion gamers. $200B market. Zero real rewards — until now.</strong></p>
+      <div class="invest-btns">
+        <a href="mailto:skjainuddin12345@gmail.com?subject=RWG%20Investor%20Deck%20Request" class="btn-primary">Request Investor Deck</a>
+        <a href="mailto:skjainuddin12345@gmail.com?subject=RWG%20Meeting%20Request" class="btn-outline">Schedule a Call →</a>
+      </div>
+      <div class="invest-contact">
+        <a href="mailto:skjainuddin12345@gmail.com">skjainuddin12345@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL STATEMENT -->
+  <section class="section-final" id="final">
+    <div class="final-glow"></div>
+    <div class="final-not fade-in">THIS IS NOT PLAY TO EARN</div>
+    <div class="final-main fade-in delay-2">PROOF<br>OF PLAY</div>
+    <button class="final-join fade-in delay-3" onclick="window.open('https://discord.gg/ay9b9vU5b','_blank')">Join RWG</button>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">REAL WORLD <span>GAMING</span></div>
+      <ul class="footer-nav">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#solution">Phases</a></li>
+        <li><a href="#pop">Mining</a></li>
+        <li><a href="#tokenomics">Token</a></li>
+        <li><a href="#chain">Chain</a></li>
+        <li><a href="#why">Vision</a></li>
+        <li><a href="#invest">Invest</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Real World Gaming. All rights reserved.</div>
+      <div class="footer-email">skjainuddin12345@gmail.com</div>
+      <div class="footer-tagline">PLAY<span>.</span> OWN<span>.</span> EARN<span>.</span></div>
+    </div>
+  </footer>
+
+</div><!-- end #website -->
+
+<script>
+/* ═══════════════════════════════════════
+   CURSOR (desktop only)
+═══════════════════════════════════════ */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+if (cursor) {
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+  (function animRing() { rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+}
+
+/* ═══════════════════════════════════════
+   MOBILE MENU
+═══════════════════════════════════════ */
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const ham  = document.getElementById('hamburger');
+  const open = menu.classList.toggle('open');
+  ham.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ═══════════════════════════════════════
+   RAIN CANVAS
+═══════════════════════════════════════ */
+const rainCanvas = document.getElementById('rain-canvas');
+const rc = rainCanvas.getContext('2d');
+rainCanvas.width = window.innerWidth;
+rainCanvas.height = window.innerHeight;
+const drops = [];
+for (let i=0;i<180;i++) drops.push({ x:Math.random()*rainCanvas.width, y:Math.random()*rainCanvas.height, speed:3+Math.random()*5, len:12+Math.random()*20, opacity:0.05+Math.random()*0.15 });
+(function drawRain() {
+  rc.clearRect(0,0,rainCanvas.width,rainCanvas.height);
+  drops.forEach(d => { rc.beginPath(); rc.moveTo(d.x,d.y); rc.lineTo(d.x-1,d.y+d.len); rc.strokeStyle=`rgba(180,200,255,${d.opacity})`; rc.lineWidth=0.5; rc.stroke(); d.y+=d.speed; if(d.y>rainCanvas.height){d.y=-d.len;d.x=Math.random()*rainCanvas.width;} });
+  requestAnimationFrame(drawRain);
+})();
+
+/* ═══════════════════════════════════════
+   CITY LIGHTS
+═══════════════════════════════════════ */
+const lightsC = document.getElementById('cityLights');
+for (let i=0;i<120;i++) {
+  const l=document.createElement('div'); l.className='light-dot';
+  const s=1+Math.random()*3;
+  l.style.cssText=`left:${Math.random()*100}%;bottom:${5+Math.random()*60}%;width:${s}px;height:${s}px;background:${Math.random()>0.6?'#ffcc44':Math.random()>0.5?'#ff6644':'#aaccff'};--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--max:${0.4+Math.random()*0.6};--min:${Math.random()*0.2};box-shadow:0 0 ${s*2}px ${s}px currentColor;`;
+  lightsC.appendChild(l);
+}
+
+/* ═══════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════ */
+const logoParts = document.getElementById('logoParts');
+for (let i=0;i<20;i++) {
+  const p=document.createElement('div'); p.className='lp';
+  p.style.cssText=`--x:${10+Math.random()*80}%;--y:${10+Math.random()*80}%;--dur:${3+Math.random()*3}s;--dl:${Math.random()*4}s;--s:${2+Math.random()*4}px;`;
+  logoParts.appendChild(p);
+}
+
+/* ═══════════════════════════════════════
+   INTRO SEQUENCE
+═══════════════════════════════════════ */
+const introBrand  = document.getElementById('introBrand');
+const introProof  = document.getElementById('introProof');
+const introSub    = document.getElementById('introSub');
+const cityLayer   = document.getElementById('cityLayer');
+const cityLights  = document.getElementById('cityLights');
+const vehicles    = document.getElementById('vehiclesLayer');
+const logoReveal  = document.getElementById('logoReveal');
+const taglineRev  = document.getElementById('taglineReveal');
+const enterBtn    = document.getElementById('enterBtn');
+const rainC       = document.getElementById('rain-canvas');
+
+setTimeout(()=>{ introBrand.classList.add('visible'); }, 300);
+setTimeout(()=>{ introProof.classList.add('visible'); }, 1800);
+setTimeout(()=>{ introSub.classList.add('visible'); }, 3000);
+setTimeout(()=>{ rainC.style.opacity='0.7'; cityLayer.style.opacity='1'; cityLights.style.opacity='1'; }, 1500);
+setTimeout(()=>{ vehicles.style.opacity='1'; }, 3500);
+setTimeout(()=>{ const s1=document.getElementById('introStep1'); s1.style.transition='opacity 1s ease'; s1.style.opacity='0'; }, 5500);
+setTimeout(()=>{ logoReveal.classList.add('visible'); setTimeout(()=>taglineRev.classList.add('visible'),400); setTimeout(()=>enterBtn.classList.add('visible'),800); }, 6800);
+
+/* ═══════════════════════════════════════
+   SKIP INTRO
+═══════════════════════════════════════ */
+function skipIntro() {
+  document.getElementById('introStep1').style.opacity='0';
+  rainC.style.opacity='0.7';
+  cityLayer.style.opacity='1';
+  cityLights.style.opacity='1';
+  vehicles.style.opacity='1';
+  setTimeout(()=>{ logoReveal.classList.add('visible'); taglineRev.classList.add('visible'); enterBtn.classList.add('visible'); },400);
+}
+// Keyboard skip
+document.addEventListener('keydown', ()=> { if(document.getElementById('intro').style.display!=='none') skipIntro(); });
+
+/* ═══════════════════════════════════════
+   ENTER WEBSITE
+═══════════════════════════════════════ */
+function enterSite() {
+  const intro   = document.getElementById('intro');
+  const website = document.getElementById('website');
+  const nav     = document.getElementById('mainNav');
+  intro.style.transition='opacity 1.2s ease';
+  intro.style.opacity='0';
+  setTimeout(()=>{
+    intro.style.display='none';
+    website.style.display='block';
+    requestAnimationFrame(()=>{
+      website.classList.add('visible');
+      setTimeout(()=>nav.classList.add('visible'),400);
+    });
+    initHeroCanvas();
+    initScrollReveal();
+  },1200);
+}
+document.getElementById('enterBtn').addEventListener('click', enterSite);
+
+/* ═══════════════════════════════════════
+   HERO CITY CANVAS
+═══════════════════════════════════════ */
+function initHeroCanvas() {
+  const c=document.getElementById('heroCityCanvas');
+  const ctx=c.getContext('2d');
+  function resize(){ c.width=c.offsetWidth; c.height=c.offsetHeight; }
+  resize(); window.addEventListener('resize',resize);
+  const buildings=[];
+  for(let i=0;i<50;i++) buildings.push({x:Math.random()*c.width,w:20+Math.random()*80,h:80+Math.random()*400,col:`hsl(0,0%,${2+Math.random()*5}%)`});
+  buildings.sort((a,b)=>a.h-b.h);
+  const bLights=[];
+  for(let i=0;i<200;i++) bLights.push({x:Math.random()*c.width,y:c.height*0.2+Math.random()*c.height*0.5,r:0.8+Math.random()*2,col:Math.random()>0.6?'#ffcc44':Math.random()>0.5?'#ff8844':'#99bbff',flicker:Math.random()*4,phase:Math.random()*Math.PI*2});
+  let t=0,carX=-100,carSpd=0.8;
+  (function draw() {
+    t+=0.005; ctx.clearRect(0,0,c.width,c.height);
+    const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,'#000'); g.addColorStop(0.6,'#050505'); g.addColorStop(1,'#070305'); ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height);
+    const rg=ctx.createRadialGradient(c.width*0.7,c.height*0.85,0,c.width*0.7,c.height*0.85,c.width*0.4); rg.addColorStop(0,'rgba(196,0,0,0.06)'); rg.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=rg; ctx.fillRect(0,0,c.width,c.height);
+    buildings.forEach(b=>{ ctx.fillStyle=b.col; ctx.fillRect(b.x,c.height-b.h,b.w,b.h); });
+    bLights.forEach(l=>{ const fl=Math.sin(t*l.flicker+l.phase),a=0.3+0.5*(fl*0.5+0.5),h=l.col.replace('#',''),r=parseInt(h.substr(0,2),16),gv=parseInt(h.substr(2,2),16),bv=parseInt(h.substr(4,2),16); ctx.beginPath(); ctx.arc(l.x,l.y,l.r,0,Math.PI*2); ctx.fillStyle=`rgba(${r},${gv},${bv},${a})`; ctx.fill(); });
+    carX+=carSpd; if(carX>c.width+100){carX=-100;carSpd=0.5+Math.random()*1.5;}
+    for(let i=0;i<2;i++){ const lg=ctx.createRadialGradient(carX+i*18,c.height-30,0,carX+i*18,c.height-30,60); lg.addColorStop(0,'rgba(255,250,220,0.8)'); lg.addColorStop(0.3,'rgba(255,240,180,0.12)'); lg.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=lg; ctx.fillRect(carX+i*18-60,c.height-90,120,90); }
+    const fg=ctx.createLinearGradient(0,c.height*0.7,0,c.height); fg.addColorStop(0,'rgba(0,0,0,0)'); fg.addColorStop(1,'rgba(0,0,0,0.92)'); ctx.fillStyle=fg; ctx.fillRect(0,0,c.width,c.height);
+    requestAnimationFrame(draw);
+  })();
+}
+
+/* ═══════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════ */
+function initScrollReveal() {
+  const els=document.querySelectorAll('.fade-in');
+  const obs=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);} }); },{threshold:0.1,rootMargin:'0px 0px -30px 0px'});
+  els.forEach(el=>obs.observe(el));
+}
+</script>
+</body>
+</html>

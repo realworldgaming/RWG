@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="Real World Gaming — Proof-of-Play blockchain gaming. Play your favorite games and earn RWG tokens through skill and participation.">
+<meta property="og:title" content="Real World Gaming | Proof-of-Play">
+<meta property="og:description" content="786M supply. Zero premine. Earned through gameplay alone.">
+<title>Real World Gaming — Proof-of-Play</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   RESET
+════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px;-webkit-font-smoothing:antialiased}
+body{
+  background:#070707;
+  color:#ede9e3;
+  font-family:'Exo 2',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+  line-height:1.65;
+}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{font-family:inherit;cursor:none;border:none;background:none}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-track{background:#070707}
+::-webkit-scrollbar-thumb{background:#c1191c;border-radius:1px}
+::selection{background:rgba(193,25,28,.3);color:#fff}
+
+/* ════════════════════════════════════════
+   VARIABLES
+════════════════════════════════════════ */
+:root{
+  --black:#070707;
+  --dk1:#0b0b0b;
+  --dk2:#101010;
+  --dk3:#161616;
+  --panel:#131313;
+  --panel2:#1b1b1b;
+  --red:#c1191c;
+  --red2:#9e1315;
+  --red-a:.12;
+  --redlo:rgba(193,25,28,.12);
+  --redmd:rgba(193,25,28,.22);
+  --redhx:rgba(193,25,28,.5);
+  --gold:#c6a23e;
+  --gold2:#e2c060;
+  --goldlo:rgba(198,162,62,.1);
+  --goldmd:rgba(198,162,62,.22);
+  --white:#ede9e3;
+  --muted:#777;
+  --faint:#333;
+  --border:rgba(255,255,255,.05);
+  --bordr:rgba(193,25,28,.16);
+  --bordg:rgba(198,162,62,.16);
+  --nav:60px;
+  --r:0px;
+}
+
+/* ════════════════════════════════════════
+   CURSOR
+════════════════════════════════════════ */
+@media(pointer:fine){
+  #cd{
+    position:fixed;top:0;left:0;
+    width:5px;height:5px;
+    background:var(--red);
+    border-radius:50%;
+    pointer-events:none;
+    z-index:99999;
+    transform:translate(-50%,-50%);
+    transition:width .12s,height .12s,background .15s;
+    will-change:transform;
+  }
+  #cr{
+    position:fixed;top:0;left:0;
+    width:24px;height:24px;
+    border:1px solid rgba(193,25,28,.4);
+    border-radius:50%;
+    pointer-events:none;
+    z-index:99998;
+    transform:translate(-50%,-50%);
+    transition:width .25s,height .25s,border-color .25s;
+  }
+  body.hov #cd{width:9px;height:9px;background:var(--gold)}
+  body.hov #cr{width:34px;height:34px;border-color:rgba(198,162,62,.35)}
+}
+@media(pointer:coarse){#cd,#cr{display:none}}
+
+/* ════════════════════════════════════════
+   GRAIN OVERLAY
+════════════════════════════════════════ */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.018;
+  pointer-events:none;
+  z-index:9990;
+}
+
+/* ════════════════════════════════════════
+   NAV
+════════════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--nav);
+  display:flex;align-items:center;
+  padding:0 56px;
+  z-index:900;
+  transition:background .4s,border-color .4s,box-shadow .4s;
+  background:rgba(7,7,7,0);
+  border-bottom:1px solid transparent;
+}
+.nav.s{
+  background:rgba(7,7,7,.97);
+  border-color:var(--bordr);
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(193,25,28,.05);
+}
+.logo{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.logo-mark{
+  width:32px;height:32px;
+  background:var(--red);
+  clip-path:polygon(0 0,100% 0,100% 68%,68% 100%,0 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron';font-size:9px;font-weight:900;
+  color:#fff;letter-spacing:-.5px;
+  flex-shrink:0;
+}
+.logo-t{
+  font-family:'Orbitron';font-weight:800;
+  font-size:15px;letter-spacing:5px;
+  color:var(--white);
+}
+.logo-t em{color:var(--red);font-style:normal}
+.nav-mid{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:2px;
+}
+.nl{
+  height:var(--nav);
+  display:flex;align-items:center;
+  padding:0 14px;
+  font-family:'Exo 2';font-weight:600;
+  font-size:11px;letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  position:relative;
+  transition:color .2s;
+}
+.nl::after{
+  content:'';
+  position:absolute;bottom:0;left:14px;right:14px;
+  height:1.5px;
+  background:var(--red);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
+}
+.nl:hover{color:var(--white)}
+.nl:hover::after{transform:scaleX(1)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nbtn{
+  height:32px;padding:0 16px;
+  font-family:'Exo 2';font-weight:700;
+  font-size:10px;letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  border:1px solid var(--border);
+  transition:all .2s;
+  display:flex;align-items:center;
+}
+.nbtn:hover{border-color:var(--bordr);color:var(--white)}
+.nbtn.fill{background:var(--red);border-color:var(--red);color:#fff}
+.nbtn.fill:hover{background:var(--red2);box-shadow:0 0 20px var(--redmd)}
+.ham{
+  display:none;flex-direction:column;gap:5px;
+  padding:6px;margin-left:auto;
+}
+.ham span{display:block;width:20px;height:1.5px;background:var(--white);transition:all .3s}
+.ham.o span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.ham.o span:nth-child(2){opacity:0}
+.ham.o span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mob{
+  position:fixed;inset:var(--nav) 0 0 0;
+  background:rgba(7,7,7,.99);
+  z-index:890;padding:2rem;
+  transform:translateX(100%);
+  transition:transform .4s cubic-bezier(.77,0,.18,1);
+  border-top:1px solid var(--bordr);
+  display:flex;flex-direction:column;
+}
+.mob.o{transform:none}
+.mob a{
+  font-family:'Orbitron';font-size:1.4rem;font-weight:700;
+  letter-spacing:.04em;color:var(--muted);
+  padding:.7rem 0;border-bottom:1px solid var(--border);
+  display:block;transition:color .2s,padding-left .2s;
+}
+.mob a:hover{color:var(--red);padding-left:.4rem}
+.mob-cta{margin-top:1.5rem;background:var(--red)!important;color:#fff!important;text-align:center;padding:.8rem!important;border:none!important}
+
+/* ════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════ */
+.w{max-width:1200px;margin:0 auto;padding:0 56px}
+.sec{padding:108px 0;position:relative}
+.sec-a{background:var(--dk1)}
+.sec-b{background:var(--dk2)}
+.sec-c{background:var(--dk3)}
+
+/* ════════════════════════════════════════
+   TYPOGRAPHY HELPERS
+════════════════════════════════════════ */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Orbitron';font-size:8.5px;font-weight:700;
+  letter-spacing:4px;color:var(--red);text-transform:uppercase;
+  margin-bottom:14px;
+}
+.eyebrow::before{content:'//';color:rgba(193,25,28,.4)}
+.h1{
+  font-family:'Orbitron';font-weight:900;
+  font-size:clamp(32px,5.2vw,64px);
+  letter-spacing:2px;line-height:.92;
+  margin-bottom:18px;
+}
+.h1 .r{color:var(--red)}
+.h1 .g{
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.h1 .o{
+  -webkit-text-stroke:1.5px rgba(255,255,255,.18);
+  color:transparent;
+}
+.rule{
+  width:38px;height:1.5px;
+  background:linear-gradient(90deg,var(--red),transparent);
+  margin:18px 0 22px;
+}
+.rule.c{margin:18px auto 22px}
+.body-lg{font-size:15px;color:var(--muted);line-height:1.9;max-width:580px}
+.body-lg strong{color:var(--white);font-weight:600}
+.body-lg.c{text-align:center;margin:0 auto}
+
+/* ════════════════════════════════════════
+   REVEAL
+════════════════════════════════════════ */
+.rv{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1),
+             transform .7s cubic-bezier(.22,1,.36,1);
+}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}
+.d4{transition-delay:.24s}.d5{transition-delay:.30s}.d6{transition-delay:.36s}
+.d7{transition-delay:.42s}.d8{transition-delay:.48s}
+
+/* ════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  height:52px;padding:0 32px;
+  font-family:'Orbitron';font-weight:700;
+  font-size:10.5px;letter-spacing:3px;text-transform:uppercase;
+  position:relative;overflow:hidden;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:transform .22s,box-shadow .3s;
+  cursor:none;
+}
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.11),transparent);
+  transform:translateX(-100%);transition:transform .55s;
+}
+.btn:hover::after{transform:translateX(100%)}
+.btn:hover{transform:translateY(-2px)}
+.btn-r{background:var(--red);color:#fff}
+.btn-r:hover{background:var(--red2);box-shadow:0 0 36px rgba(193,25,28,.4)}
+.btn-g{
+  background:transparent;
+  border:1.5px solid var(--gold);color:var(--gold);
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.btn-g:hover{background:var(--gold);color:#000;box-shadow:0 0 28px rgba(198,162,62,.3)}
+.btn-o{
+  background:transparent;
+  border:1px solid var(--border);color:var(--muted);
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.btn-o:hover{border-color:rgba(255,255,255,.25);color:var(--white)}
+.btn-sm{height:40px;padding:0 22px;font-size:9.5px;letter-spacing:2.5px;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btns.c{justify-content:center}
+
+/* ════════════════════════════════════════
+   TICKER
+════════════════════════════════════════ */
+.ticker{
+  display:flex;overflow:hidden;
+  background:rgba(193,25,28,.05);
+  border-top:1px solid var(--bordr);
+  border-bottom:1px solid var(--bordr);
+}
+.tick-lbl{
+  flex-shrink:0;background:var(--red);
+  padding:0 20px;display:flex;align-items:center;
+  font-family:'Orbitron';font-size:8.5px;font-weight:800;
+  letter-spacing:3px;color:#fff;white-space:nowrap;text-transform:uppercase;
+}
+.tick-inner{
+  display:inline-flex;gap:1.8rem;white-space:nowrap;
+  animation:tick 32s linear infinite;
+  font-family:'Orbitron';font-size:8.5px;letter-spacing:2px;
+  color:var(--muted);text-transform:uppercase;padding:10px 16px;
+}
+.tick-inner .s{color:var(--red)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ════════════════════════════════════════
+   HERO
+════════════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+  background:var(--black);
+  padding-top:var(--nav);
+}
+.h-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(193,25,28,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(193,25,28,.04) 1px,transparent 1px);
+  background-size:66px 66px;
+  animation:gdrift 20s linear infinite;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+}
+@keyframes gdrift{from{background-position:0 0}to{background-position:66px 66px}}
+.h-scan{
+  position:absolute;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent,rgba(193,25,28,.7),transparent);
+  animation:scan 9s linear infinite;pointer-events:none;
+}
+@keyframes scan{0%{top:0;opacity:1}95%{opacity:1}100%{top:100%;opacity:0}}
+.h-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px)}
+.h-o1{width:700px;height:700px;background:rgba(193,25,28,.055);right:-8%;top:42%;transform:translateY(-42%)}
+.h-o2{width:380px;height:380px;background:rgba(198,162,62,.03);right:18%;top:15%}
+.h-o3{width:300px;height:300px;background:rgba(193,25,28,.04);left:-5%;bottom:18%}
+.h-lines{position:absolute;inset:0;pointer-events:none;opacity:.065}
+.h-body{
+  position:relative;z-index:10;
+  padding:0 56px;
+  max-width:980px;
+}
+.h-pre{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Orbitron';font-size:8.5px;font-weight:700;
+  letter-spacing:4.5px;color:var(--red);text-transform:uppercase;
+  margin-bottom:24px;
+  animation:fu .8s .1s both;
+}
+.h-pre::before{content:'';width:24px;height:1.5px;background:var(--red)}
+.h-dot{
+  width:5px;height:5px;background:var(--red);border-radius:50%;
+  animation:pd 2.2s infinite;
+}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.5)}}
+.h-h1{
+  font-family:'Orbitron';font-weight:900;
+  font-size:clamp(52px,10vw,128px);
+  letter-spacing:3px;line-height:.85;
+  margin-bottom:12px;
+  animation:fu .9s .2s both;
+}
+.h-h1 .ln2{
+  display:block;
+  -webkit-text-stroke:1.5px rgba(255,255,255,.16);
+  color:transparent;
+}
+.h-h1 .ln3{
+  display:block;
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 50%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  background-size:200% auto;
+  animation:fu .9s .2s both,gshift 4s 1.5s linear infinite;
+}
+@keyframes gshift{0%{background-position:0%}100%{background-position:200%}}
+.h-div{
+  width:50px;height:1.5px;
+  background:linear-gradient(90deg,var(--red),transparent);
+  margin:22px 0;
+  animation:fu .6s .42s both;
+}
+.h-sub{
+  font-family:'Exo 2';font-weight:300;
+  font-size:clamp(15px,2vw,22px);
+  letter-spacing:7px;color:var(--muted);
+  text-transform:uppercase;margin-bottom:8px;
+  animation:fu .7s .52s both;
+}
+.h-sub span{color:var(--gold);font-weight:500}
+.h-tag{
+  font-size:13px;color:rgba(255,255,255,.3);
+  letter-spacing:.8px;margin-bottom:40px;
+  animation:fu .7s .62s both;
+}
+.h-btns{animation:fu .7s .78s both}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* hero bottom bar */
+.h-bar{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  background:rgba(18,18,18,.94);
+  border-top:1px solid var(--bordr);
+  backdrop-filter:blur(16px);
+  display:flex;height:72px;padding:0 56px;
+  animation:fu .6s 1.1s both;
+}
+.hs{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:0 22px;border-right:1px solid var(--border);
+}
+.hs:first-child{padding-left:0}
+.hs:last-child{border:none}
+.hs-v{
+  font-family:'Orbitron';font-weight:900;
+  font-size:22px;line-height:1;
+  letter-spacing:1px;margin-bottom:3px;
+  color:var(--red);
+}
+.hs-v.g{
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hs-k{font-family:'Orbitron';font-size:7.5px;letter-spacing:2.5px;color:var(--faint);text-transform:uppercase}
+
+/* ════════════════════════════════════════
+   PROBLEM SECTION — full split
+════════════════════════════════════════ */
+.problem-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.p-stat-block{display:flex;flex-direction:column;gap:2px}
+.p-stat{
+  background:var(--panel);border:1px solid var(--border);
+  padding:26px 28px;
+  border-left:2px solid var(--red);
+  transition:all .3s;
+}
+.p-stat:hover{background:var(--panel2);border-color:var(--bordr)}
+.p-stat-n{
+  font-family:'Orbitron';font-weight:900;
+  font-size:clamp(32px,4vw,52px);
+  color:var(--red);line-height:1;letter-spacing:1px;margin-bottom:6px;
+}
+.p-stat-l{font-size:12px;color:var(--muted);letter-spacing:.5px}
+.problem-quote{
+  background:var(--panel);
+  border:1px solid var(--bordr);
+  border-left:3px solid var(--red);
+  padding:28px 30px;
+  margin-top:2px;
+}
+.pq-text{
+  font-style:italic;font-size:16px;
+  color:rgba(255,255,255,.55);line-height:1.9;
+  margin-bottom:0;
+}
+
+/* ════════════════════════════════════════
+   VISION — WHY MATTERS comparison
+════════════════════════════════════════ */
+.consensus-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;margin:52px 0;
+}
+.cs-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:42px 32px;
+  position:relative;overflow:hidden;
+  transition:all .35s;
+}
+.cs-card.hi{
+  background:rgba(193,25,28,.07);
+  border-color:var(--bordr);
+}
+.cs-card:hover{background:var(--panel2);border-color:var(--bordr)}
+.cs-card.hi:hover{background:rgba(193,25,28,.1)}
+.cs-num{
+  position:absolute;top:14px;right:16px;
+  font-family:'Orbitron';font-weight:900;font-size:90px;
+  color:rgba(193,25,28,.035);line-height:1;
+  transition:color .35s;
+}
+.cs-card:hover .cs-num{color:rgba(193,25,28,.08)}
+.cs-tag{
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:3px;color:var(--muted);
+  text-transform:uppercase;margin-bottom:14px;
+}
+.cs-chain{
+  font-family:'Orbitron';font-weight:900;
+  font-size:22px;letter-spacing:2px;
+  color:var(--white);margin-bottom:6px;
+}
+.cs-pop{
+  font-family:'Orbitron';font-weight:900;
+  font-size:22px;letter-spacing:2px;
+  color:var(--red);margin-bottom:6px;
+}
+.cs-method{
+  font-size:13px;color:var(--muted);
+  line-height:1.7;margin-bottom:16px;
+}
+.cs-label{
+  display:inline-block;
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:4px 12px;border:1px solid;
+}
+.cs-label.red{color:var(--red);border-color:var(--bordr);background:var(--redlo)}
+.cs-label.dim{color:var(--faint);border-color:var(--border)}
+
+/* ════════════════════════════════════════
+   ECOSYSTEM
+════════════════════════════════════════ */
+.eco-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;
+}
+.eco-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:48px 38px;
+  position:relative;overflow:hidden;
+  transition:all .35s;
+  display:flex;flex-direction:column;
+}
+.eco-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--red);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s;
+}
+.eco-card:hover::before{transform:scaleX(1)}
+.eco-card:hover{
+  background:var(--panel2);border-color:var(--bordr);
+  transform:translateY(-4px);
+  box-shadow:0 22px 55px rgba(0,0,0,.55);
+}
+.eco-card:hover .eco-n{color:rgba(193,25,28,.09)}
+.eco-card:hover .eco-title{color:var(--red)}
+.eco-n{
+  position:absolute;top:16px;right:18px;
+  font-family:'Orbitron';font-weight:900;font-size:110px;
+  color:rgba(193,25,28,.04);line-height:1;
+  transition:color .35s;
+}
+.eco-ph{
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:3px;color:var(--red);
+  text-transform:uppercase;margin-bottom:16px;
+}
+.eco-title{
+  font-family:'Orbitron';font-weight:900;
+  font-size:30px;letter-spacing:2px;
+  color:var(--white);margin-bottom:14px;
+  line-height:1;transition:color .35s;
+}
+.eco-desc{
+  font-size:14px;color:var(--muted);
+  line-height:1.82;margin-bottom:30px;flex:1;
+}
+.eco-feats{
+  border-top:1px solid var(--border);
+  padding-top:22px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.eco-feat{
+  display:flex;align-items:center;
+  gap:10px;font-size:13px;color:var(--muted);
+}
+.eco-feat::before{
+  content:'';width:4px;height:4px;
+  background:var(--red);flex-shrink:0;
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+
+/* ════════════════════════════════════════
+   POP SECTION
+════════════════════════════════════════ */
+.pop-flow{
+  display:flex;align-items:stretch;
+  margin:48px 0 2px;
+}
+.pop-step{
+  flex:1;
+  background:var(--panel);border:1px solid var(--border);
+  padding:30px 18px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  transition:all .3s;position:relative;
+}
+.pop-step.hi{background:var(--redlo);border-color:var(--bordr)}
+.pop-step.hi .ps-t{color:var(--red)}
+.pop-step:hover{background:var(--panel2);border-color:var(--bordr);transform:translateY(-3px)}
+.pop-arr{
+  width:30px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;
+  color:var(--red);font-size:16px;font-weight:800;
+}
+.ps-i{font-size:2.2rem;margin-bottom:12px}
+.ps-t{
+  font-family:'Orbitron';font-weight:700;
+  font-size:11.5px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--white);
+  margin-bottom:8px;transition:color .3s;
+}
+.ps-d{font-size:11px;color:var(--muted);line-height:1.6}
+.pop-specs{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:2px;margin-top:2px;
+}
+.pop-spec{
+  background:var(--panel);border:1px solid var(--border);
+  padding:28px 18px;text-align:center;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.pop-spec::after{
+  content:'';position:absolute;
+  bottom:0;left:0;width:0;height:2px;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+  transition:width .45s;
+}
+.pop-spec:hover::after{width:100%}
+.pop-spec:hover{background:var(--panel2)}
+.pv{
+  font-family:'Orbitron';font-weight:900;
+  font-size:34px;color:var(--red);
+  letter-spacing:1px;line-height:1;margin-bottom:8px;
+}
+.pv.g{
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.pk{
+  font-family:'Orbitron';font-size:9px;
+  letter-spacing:2.5px;color:var(--faint);text-transform:uppercase;
+}
+
+/* ════════════════════════════════════════
+   TOKENOMICS
+════════════════════════════════════════ */
+.tok-stats{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:2px;margin-bottom:2px;
+}
+.tok-s{
+  background:var(--panel);border:1px solid var(--border);
+  padding:32px 16px;text-align:center;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.tok-s::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+  transform:scaleX(0);transform-origin:left;transition:transform .5s;
+}
+.tok-s:hover::before{transform:scaleX(1)}
+.tok-s:hover{background:var(--panel2);border-color:var(--bordr)}
+.tv{
+  font-family:'Orbitron';font-weight:900;
+  font-size:clamp(20px,2.8vw,36px);
+  line-height:1;margin-bottom:8px;letter-spacing:1px;
+}
+.tv.r{color:var(--red)}
+.tv.g{
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.tk{font-family:'Orbitron';font-size:8px;letter-spacing:2.5px;color:var(--faint);text-transform:uppercase}
+.tok-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;
+}
+.tok-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:30px 26px;transition:all .3s;
+}
+.tok-card:hover{background:var(--panel2);border-color:var(--bordr)}
+.tc-lbl{
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:3px;color:var(--red);text-transform:uppercase;
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.tc-lbl::before{content:'//';color:rgba(193,25,28,.35)}
+.tc-v{
+  font-family:'Orbitron';font-weight:900;
+  font-size:30px;letter-spacing:1px;
+  color:var(--red);margin-bottom:10px;
+}
+.tc-v.g{
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.tc-d{font-size:13px;color:var(--muted);line-height:1.75}
+.halving-wrap{
+  background:var(--panel);border:1px solid var(--border);
+  padding:30px;margin-top:2px;
+}
+.hw-lbl{
+  font-family:'Orbitron';font-size:8.5px;letter-spacing:3px;
+  color:var(--faint);text-transform:uppercase;margin-bottom:22px;
+}
+.h-bars{display:flex;align-items:flex-end;gap:8px;height:130px}
+.hbw{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.hb{
+  width:100%;
+  background:var(--panel2);border:1px solid var(--border);border-bottom:none;
+  display:flex;align-items:flex-end;flex:1;
+  transition:border-color .3s;
+}
+.hb:hover{border-color:var(--bordr)}
+.hbf{
+  width:100%;
+  background:linear-gradient(to top,var(--red),rgba(193,25,28,.25));
+  transition:height 1.3s cubic-bezier(.22,1,.36,1);
+}
+.hbl{
+  font-family:'Orbitron';font-size:7.5px;letter-spacing:1px;
+  color:var(--faint);text-align:center;flex-shrink:0;
+}
+
+/* ════════════════════════════════════════
+   ROADMAP
+════════════════════════════════════════ */
+.rm-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;
+}
+.rm-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:44px 36px;position:relative;overflow:hidden;
+  transition:all .35s;
+}
+.rm-card.on{background:var(--redlo);border-color:var(--bordr)}
+.rm-card.on .rm-title{color:var(--red)}
+.rm-card:hover{background:var(--panel2);border-color:var(--bordr)}
+.rm-n{
+  position:absolute;top:14px;right:16px;
+  font-family:'Orbitron';font-weight:900;font-size:90px;
+  color:rgba(193,25,28,.04);line-height:1;transition:color .35s;
+}
+.rm-card:hover .rm-n{color:rgba(193,25,28,.09)}
+.rm-ph{
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:3px;color:var(--gold);text-transform:uppercase;
+  margin-bottom:10px;
+}
+.rm-title{
+  font-family:'Orbitron';font-weight:900;
+  font-size:22px;letter-spacing:2px;
+  color:var(--white);margin-bottom:8px;
+  transition:color .35s;
+}
+.rm-bar{
+  width:32px;height:1.5px;
+  background:linear-gradient(90deg,var(--red),transparent);
+  margin-bottom:24px;
+}
+.rm-items{display:flex;flex-direction:column;gap:10px}
+.rm-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--muted);
+}
+.rm-item::before{
+  content:'';width:4px;height:4px;
+  background:var(--red);flex-shrink:0;
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+
+/* ════════════════════════════════════════
+   FOUNDER
+════════════════════════════════════════ */
+.founder{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-top:2px solid var(--gold);
+  padding:44px;
+  display:grid;grid-template-columns:auto 1fr;
+  gap:38px;align-items:start;
+  transition:all .35s;
+}
+.founder:hover{background:var(--panel2);border-color:var(--bordg)}
+.fav{
+  width:100px;height:100px;
+  background:linear-gradient(135deg,var(--red2),var(--dk3));
+  border:2px solid var(--bordg);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron';font-weight:900;font-size:30px;
+  color:var(--gold);flex-shrink:0;
+}
+.fn{font-family:'Orbitron';font-weight:900;font-size:26px;letter-spacing:2px;margin-bottom:4px}
+.fr{font-family:'Orbitron';font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:18px}
+.fq{
+  font-style:italic;font-size:15px;
+  color:rgba(255,255,255,.52);
+  line-height:1.85;
+  border-left:2px solid var(--gold);
+  padding-left:18px;margin-bottom:20px;
+}
+.fb{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:22px}
+.flink{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Orbitron';font-size:9px;letter-spacing:2px;
+  color:var(--muted);text-transform:uppercase;
+  transition:color .2s;
+}
+.flink:hover{color:var(--gold)}
+.flink::after{content:'→';color:var(--gold)}
+
+/* ════════════════════════════════════════
+   COMMUNITY
+════════════════════════════════════════ */
+.soc-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.soc-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:34px 26px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:14px;
+  text-decoration:none;
+  transition:all .35s;position:relative;overflow:hidden;
+}
+.soc-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(193,25,28,.04),transparent);
+  opacity:0;transition:opacity .35s;
+}
+.soc-card:hover{
+  background:var(--panel2);border-color:var(--bordr);
+  transform:translateY(-5px);
+  box-shadow:0 20px 50px rgba(0,0,0,.55);
+}
+.soc-card:hover::before{opacity:1}
+.soc-icon{font-size:2.4rem}
+.soc-name{font-family:'Orbitron';font-weight:700;font-size:15px;letter-spacing:2px;color:var(--white)}
+.soc-handle{font-family:'Orbitron';font-size:8.5px;letter-spacing:1px;color:var(--red)}
+.soc-desc{font-size:12px;color:var(--muted);line-height:1.65}
+.soc-btn{
+  font-family:'Orbitron';font-size:8.5px;letter-spacing:2px;
+  color:var(--muted);border:1px solid var(--border);
+  padding:5px 14px;text-transform:uppercase;
+  transition:all .2s;margin-top:auto;
+}
+.soc-card:hover .soc-btn{border-color:var(--red);color:var(--red)}
+
+/* ════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════ */
+.foot{background:#030303;border-top:1px solid var(--border);padding:64px 0 28px}
+.foot-top{
+  display:grid;grid-template-columns:1.5fr repeat(3,1fr);
+  gap:52px;padding-bottom:52px;
+  border-bottom:1px solid var(--border);margin-bottom:30px;
+}
+.f-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.f-logo-mark{
+  width:28px;height:28px;background:var(--red);
+  clip-path:polygon(0 0,100% 0,100% 68%,68% 100%,0 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron';font-size:8px;font-weight:900;color:#fff;
+}
+.f-logo-t{font-family:'Orbitron';font-weight:800;font-size:15px;letter-spacing:5px}
+.f-logo-t em{color:var(--red);font-style:normal}
+.f-tag{font-size:13px;color:var(--muted);line-height:1.75;max-width:230px;margin-bottom:22px}
+.f-socs{display:flex;gap:8px}
+.f-soc{
+  width:34px;height:34px;background:var(--panel);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .2s;text-decoration:none;
+}
+.f-soc:hover{background:var(--red);border-color:var(--red);transform:translateY(-2px)}
+.f-founder{
+  background:var(--panel);border:1px solid var(--border);
+  border-left:2px solid var(--gold);padding:14px 16px;
+  margin-top:16px;
+}
+.ff-n{font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:1px;margin-bottom:2px}
+.ff-r{font-family:'Orbitron';font-size:8px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.ff-l{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'Orbitron';font-size:8px;letter-spacing:1.5px;
+  color:var(--muted);text-decoration:none;text-transform:uppercase;
+  transition:color .2s;
+}
+.ff-l:hover{color:var(--gold)}
+.f-col-t{
+  font-family:'Orbitron';font-weight:700;
+  font-size:10px;letter-spacing:3.5px;
+  text-transform:uppercase;color:var(--white);
+  margin-bottom:18px;
+}
+.f-links{display:flex;flex-direction:column;gap:9px}
+.f-link{
+  font-size:12px;color:var(--muted);
+  transition:color .2s,padding-left .2s;
+  letter-spacing:.3px;display:block;
+}
+.f-link:hover{color:var(--red);padding-left:4px}
+.foot-bot{
+  display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:14px;
+}
+.f-copy{font-size:11px;color:var(--faint);letter-spacing:.5px}
+.f-supply{font-family:'Orbitron';font-size:8.5px;color:rgba(193,25,28,.2);letter-spacing:1.5px}
+.f-slogan{font-family:'Orbitron';font-size:9.5px;letter-spacing:3px;color:var(--faint)}
+.f-slogan span{color:var(--red)}
+
+/* ════════════════════════════════════════
+   DIVIDERS + MISC
+════════════════════════════════════════ */
+.hdiv{height:1px;background:linear-gradient(90deg,transparent,var(--bordr),transparent)}
+.tag{
+  display:inline-block;
+  font-family:'Orbitron';font-size:8px;font-weight:700;
+  letter-spacing:2.5px;text-transform:uppercase;
+  padding:4px 12px;border:1px solid;
+}
+.tag-r{color:var(--red);border-color:var(--bordr);background:var(--redlo)}
+.tag-d{color:var(--faint);border-color:var(--border)}
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media(max-width:1100px){
+  .tok-stats{grid-template-columns:repeat(3,1fr)}
+  .foot-top{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:900px){
+  .w{padding:0 28px}
+  .nav{padding:0 28px}
+  .nav-mid,.nav-r{display:none}
+  .ham{display:flex}
+  .h-body{padding:0 28px}
+  .h-bar{padding:0 28px;height:auto;flex-wrap:wrap}
+  .hs{min-width:50%;padding:12px 16px;border-bottom:1px solid var(--border)}
+  .problem-grid{grid-template-columns:1fr}
+  .consensus-row{grid-template-columns:1fr}
+  .eco-grid{grid-template-columns:1fr}
+  .pop-flow{flex-direction:column}
+  .pop-arr{transform:rotate(90deg)}
+  .pop-specs{grid-template-columns:repeat(2,1fr)}
+  .tok-stats{grid-template-columns:repeat(2,1fr)}
+  .tok-cards{grid-template-columns:1fr}
+  .rm-grid{grid-template-columns:1fr}
+  .soc-grid{grid-template-columns:repeat(2,1fr)}
+  .founder{grid-template-columns:1fr}
+  .foot-top{grid-template-columns:1fr 1fr;gap:28px}
+}
+@media(max-width:600px){
+  .sec{padding:68px 0}
+  .h-h1{font-size:clamp(46px,13vw,80px)}
+  .h-bar{display:none}
+  .soc-grid{grid-template-columns:1fr}
+  .tok-stats{grid-template-columns:1fr 1fr}
+  .btns{flex-direction:column;align-items:flex-start}
+  .btns.c{align-items:center}
+  .foot-top{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cd"></div>
+<div id="cr"></div>
+
+<!-- ══════════════════════════════════
+   NAV
+══════════════════════════════════ -->
+<nav class="nav" id="nav">
+  <a href="#home" class="logo">
+    <div class="logo-mark">RWG</div>
+    <span class="logo-t">RW<em>G</em></span>
+  </a>
+  <div class="nav-mid">
+    <a href="#problem" class="nl">Vision</a>
+    <a href="#ecosystem" class="nl">Ecosystem</a>
+    <a href="#pop" class="nl">Mining</a>
+    <a href="#tokenomics" class="nl">Tokenomics</a>
+    <a href="#roadmap" class="nl">Roadmap</a>
+    <a href="#community" class="nl">Community</a>
+  </div>
+  <div class="nav-r">
+    <a href="#founder" class="nbtn">Founder</a>
+    <a href="#ecosystem" class="nbtn fill">Launch App</a>
+  </div>
+  <button class="ham" id="ham"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob" id="mob">
+  <a href="#problem" onclick="cm()">Vision</a>
+  <a href="#ecosystem" onclick="cm()">Ecosystem</a>
+  <a href="#pop" onclick="cm()">Mining</a>
+  <a href="#tokenomics" onclick="cm()">Tokenomics</a>
+  <a href="#roadmap" onclick="cm()">Roadmap</a>
+  <a href="#founder" onclick="cm()">Founder</a>
+  <a href="#community" onclick="cm()">Community</a>
+  <a href="#ecosystem" class="mob-cta" onclick="cm()">Launch App</a>
+</div>
+
+<!-- ══════════════════════════════════
+   1. HERO
+══════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="h-grid"></div>
+  <div class="h-scan"></div>
+  <div class="h-orb h-o1"></div>
+  <div class="h-orb h-o2"></div>
+  <div class="h-orb h-o3"></div>
+
+  <svg class="h-lines" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none">
+    <polyline points="1280,0 1280,210 1400,330 1440,330" stroke="#c1191c" stroke-width="1"/>
+    <circle cx="1280" cy="210" r="3" fill="#c1191c"/>
+    <circle cx="1400" cy="330" r="3" fill="#c1191c"/>
+    <polyline points="1060,900 1060,580 940,460 700,460" stroke="#c6a23e" stroke-width="1"/>
+    <circle cx="1060" cy="580" r="3" fill="#c6a23e"/>
+    <circle cx="940" cy="460" r="3" fill="#c6a23e"/>
+    <polyline points="0,150 220,150 340,270 340,500" stroke="#c1191c" stroke-width=".55" stroke-dasharray="0"/>
+    <polyline points="40,900 40,680 140,580 300,580" stroke="#c1191c" stroke-width=".55" stroke-dasharray="6 12" opacity=".6"/>
+    <rect x="1200" y="420" width="80" height="80" stroke="#c1191c" stroke-width=".5" fill="none" opacity=".4"/>
+    <rect x="1210" y="430" width="60" height="60" stroke="#c1191c" stroke-width=".3" fill="none" opacity=".3"/>
+  </svg>
+
+  <div class="h-body">
+    <div class="h-pre"><div class="h-dot"></div>Proof-of-Play Blockchain Gaming</div>
+    <h1 class="h-h1">
+      REAL<br>
+      <span class="ln2">WORLD</span>
+      <span class="ln3">GAMING</span>
+    </h1>
+    <div class="h-div"></div>
+    <p class="h-sub">Play Your Favorite Games&nbsp;&nbsp;·&nbsp;&nbsp;<span>Mine RWG Tokens</span></p>
+    <p class="h-tag">The world's first Proof-of-Play ecosystem &mdash; gameplay is the mining rig.</p>
+    <div class="btns h-btns">
+      <a href="#ecosystem" class="btn btn-r">Explore Ecosystem <span style="font-size:.85em">→</span></a>
+      <a href="#tokenomics" class="btn btn-g">View Tokenomics</a>
+      <a href="#pop" class="btn btn-o">How It Works</a>
+    </div>
+  </div>
+
+  <div class="h-bar">
+    <div class="hs"><div class="hs-v">786M</div><div class="hs-k">Total Supply</div></div>
+    <div class="hs"><div class="hs-v">10<span style="font-size:.55em">min</span></div><div class="hs-k">Block Time</div></div>
+    <div class="hs"><div class="hs-v">144</div><div class="hs-k">Blocks / Day</div></div>
+    <div class="hs"><div class="hs-v g">5<span style="font-size:.55em">yr</span></div><div class="hs-k">Halving Cycle</div></div>
+    <div class="hs"><div class="hs-v">100<span style="font-size:.55em">yr</span></div><div class="hs-k">Emission</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="tick-lbl">RWG NETWORK</div>
+  <div style="overflow:hidden;flex:1;padding:0">
+    <div class="tick-inner">
+      <span>Proof-of-Play Mining</span><span class="s">◆</span>
+      <span>786M Fixed Supply</span><span class="s">◆</span>
+      <span>10-Minute Blocks</span><span class="s">◆</span>
+      <span>Zero Premine</span><span class="s">◆</span>
+      <span>Zero VC Allocation</span><span class="s">◆</span>
+      <span>5-Year Halving</span><span class="s">◆</span>
+      <span>100-Year Emission</span><span class="s">◆</span>
+      <span>RWG Store</span><span class="s">◆</span>
+      <span>RWG Launcher</span><span class="s">◆</span>
+      <span>RWG Studio</span><span class="s">◆</span>
+      <span>Proof-of-Play Mining</span><span class="s">◆</span>
+      <span>786M Fixed Supply</span><span class="s">◆</span>
+      <span>10-Minute Blocks</span><span class="s">◆</span>
+      <span>Zero Premine</span><span class="s">◆</span>
+      <span>Zero VC Allocation</span><span class="s">◆</span>
+      <span>5-Year Halving</span><span class="s">◆</span>
+      <span>100-Year Emission</span><span class="s">◆</span>
+      <span>RWG Store</span><span class="s">◆</span>
+      <span>RWG Launcher</span><span class="s">◆</span>
+      <span>RWG Studio</span><span class="s">◆</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+   2. THE PROBLEM
+══════════════════════════════════ -->
+<section class="sec sec-a" id="problem">
+  <div class="w">
+    <div class="problem-grid">
+      <div>
+        <div class="eyebrow rv">The Problem</div>
+        <h2 class="h1 rv">Gaming Builds<br><span class="r">Empires.</span><br><span class="o">Players Get</span><br><span class="r">Nothing.</span></h2>
+        <div class="rule rv"></div>
+        <p class="body-lg rv">Modern gaming generates <strong>hundreds of billions of dollars</strong> annually. Publishers, platforms and investors capture almost all of it.</p>
+        <p class="body-lg rv" style="margin-top:14px">Players invest thousands of hours mastering games, building skills and shaping digital worlds. They receive <strong>zero economic return</strong> for that contribution.</p>
+        <p class="body-lg rv" style="margin-top:14px">At the same time, most blockchain gaming projects rely on inflationary token systems that collapse under speculation. RWG is designed to solve both problems.</p>
+        <div class="btns rv" style="margin-top:32px">
+          <a href="#vision" class="btn btn-r btn-sm">The Solution →</a>
+        </div>
+      </div>
+      <div>
+        <div class="p-stat-block rv">
+          <div class="p-stat">
+            <div class="p-stat-n">$200B+</div>
+            <div class="p-stat-l">Annual global gaming revenue — almost none returned to players</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-n">3.2B</div>
+            <div class="p-stat-l">Active players worldwide contributing billions of hours per year</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-n">$0</div>
+            <div class="p-stat-l">Economic value most players receive for years of skill development</div>
+          </div>
+        </div>
+        <div class="problem-quote rv" style="margin-top:2px">
+          <p class="pq-text">"Players spend thousands of hours mastering games. RWG is built to ensure that skill and dedication can translate into real digital value."</p>
+          <div style="margin-top:14px;font-family:'Orbitron';font-size:9px;letter-spacing:2px;color:var(--gold)">— Shaik Jainuddin, Founder</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   3. THE VISION / WHY IT MATTERS
+══════════════════════════════════ -->
+<section class="sec sec-b" id="vision">
+  <div class="w">
+    <div style="text-align:center;max-width:680px;margin:0 auto">
+      <div class="eyebrow rv" style="justify-content:center">The Solution</div>
+      <h2 class="h1 rv" style="text-align:center">A Third Consensus.<br><span class="r">Proof-of-Play.</span></h2>
+      <div class="rule rv c"></div>
+      <p class="body-lg rv c" style="max-width:100%">RWG introduces a new model where gameplay participation can contribute to a digital economy. Instead of mining with hardware or staking capital, participation comes through skill.</p>
+    </div>
+
+    <div class="consensus-row">
+      <div class="cs-card rv d1">
+        <div class="cs-num">1</div>
+        <div class="cs-tag">// 2009 — Layer 1</div>
+        <div class="cs-chain">BITCOIN</div>
+        <div class="cs-chain" style="font-size:14px;color:var(--muted);margin-bottom:12px">Proof-of-Work</div>
+        <p class="cs-method">Mine with hardware. Secure the network with computational energy. Electricity and silicon determine participation.</p>
+        <span class="cs-label dim">Established</span>
+      </div>
+      <div class="cs-card rv d2">
+        <div class="cs-num">2</div>
+        <div class="cs-tag">// 2015 — Layer 1</div>
+        <div class="cs-chain">ETHEREUM</div>
+        <div class="cs-chain" style="font-size:14px;color:var(--muted);margin-bottom:12px">Proof-of-Stake</div>
+        <p class="cs-method">Mine with capital. Lock tokens to secure the network. Financial position determines participation.</p>
+        <span class="cs-label dim">Established</span>
+      </div>
+      <div class="cs-card hi rv d3">
+        <div class="cs-num">3</div>
+        <div class="cs-tag">// 2025 — New Category</div>
+        <div class="cs-pop">REAL WORLD GAMING</div>
+        <div class="cs-pop" style="font-size:14px;color:var(--gold);margin-bottom:12px">Proof-of-Play</div>
+        <p class="cs-method">Mine through gameplay. Skill and participation secure economic value. Your ability determines your participation.</p>
+        <span class="cs-label red">Introducing Now</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px">
+      <div class="tok-card rv d1">
+        <div class="tc-lbl">No Hardware</div>
+        <p class="tc-d">No ASICs. No GPUs. No electricity bills. The device you already game on is sufficient to participate.</p>
+      </div>
+      <div class="tok-card rv d2">
+        <div class="tc-lbl">No Capital Required</div>
+        <p class="tc-d">No tokens to stake, no capital to lock. Participation is earned through gameplay activity — not financial position.</p>
+      </div>
+      <div class="tok-card rv d3">
+        <div class="tc-lbl">Skill Drives Value</div>
+        <p class="tc-d">Better play generates stronger participation signals. The system is designed to reward genuine skill and engagement over time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   4. ECOSYSTEM
+══════════════════════════════════ -->
+<section class="sec sec-c" id="ecosystem">
+  <div class="w">
+    <div style="text-align:center;max-width:660px;margin:0 auto 60px">
+      <div class="eyebrow rv" style="justify-content:center">Three Pillars</div>
+      <h2 class="h1 rv" style="text-align:center">The RWG <span class="r">Ecosystem</span></h2>
+      <div class="rule rv c"></div>
+      <p class="body-lg rv c" style="max-width:100%">Each component is designed to work in concert — the Store provides the library, the Launcher activates mining, the Studio builds the original experiences that power it all.</p>
+    </div>
+
+    <div class="eco-grid">
+      <div class="eco-card rv d1">
+        <div class="eco-n">1</div>
+        <div class="eco-ph">// Phase 01 · Marketplace</div>
+        <div class="eco-title">RWG<br>STORE</div>
+        <p class="eco-desc">A digital marketplace where players discover, purchase and truly own games through blockchain-verified ownership. Pay with crypto or fiat. Every purchase recorded permanently on-chain.</p>
+        <div class="eco-feats">
+          <div class="eco-feat">Blockchain-verified game ownership</div>
+          <div class="eco-feat">Crypto and fiat payment support</div>
+          <div class="eco-feat">Community hubs per game</div>
+          <div class="eco-feat">Player reviews and gameplay clips</div>
+          <div class="eco-feat">Integrated creator content</div>
+        </div>
+      </div>
+      <div class="eco-card rv d2">
+        <div class="eco-n">2</div>
+        <div class="eco-ph">// Phase 02 · Mining Engine</div>
+        <div class="eco-title">RWG<br>LAUNCHER</div>
+        <p class="eco-desc">The Proof-of-Play mining engine. Launch supported games, generate gameplay performance signals and participate in the RWG network. Your skill determines your participation — every block cycle.</p>
+        <div class="eco-feats">
+          <div class="eco-feat">Supported game library</div>
+          <div class="eco-feat">Real-time performance tracking</div>
+          <div class="eco-feat">Competitive leaderboards</div>
+          <div class="eco-feat">Mining eligibility dashboard</div>
+          <div class="eco-feat">Player statistics and history</div>
+        </div>
+      </div>
+      <div class="eco-card rv d3">
+        <div class="eco-n">3</div>
+        <div class="eco-ph">// Phase 03 · Development</div>
+        <div class="eco-title">RWG<br>STUDIO</div>
+        <p class="eco-desc">The long-term vision of RWG. In-house AAA game development building original titles designed from the ground up around decentralized economies and creator-driven ecosystems.</p>
+        <div class="eco-feats">
+          <div class="eco-feat">Original AAA game development</div>
+          <div class="eco-feat">Open-world multiplayer experiences</div>
+          <div class="eco-feat">Creator tools and modding SDK</div>
+          <div class="eco-feat">Global competitive leagues</div>
+          <div class="eco-feat">Decentralized creator economies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   5. PROOF OF PLAY
+══════════════════════════════════ -->
+<section class="sec sec-a" id="pop">
+  <div class="w">
+    <div class="eyebrow rv">The Protocol</div>
+    <h2 class="h1 rv">Proof-of-<span class="r">Play</span><br><span class="o">How It Works</span></h2>
+    <div class="rule rv"></div>
+    <p class="body-lg rv" style="margin-bottom:44px">Players participate through gameplay — not hardware or capital. The RWG Launcher tracks performance signals across supported games and distributes rewards to qualifying participants each block cycle.</p>
+
+    <div class="pop-flow rv">
+      <div class="pop-step">
+        <div class="ps-i">🎮</div>
+        <div class="ps-t">Player</div>
+        <p class="ps-d">Launch any supported game via the RWG Launcher</p>
+      </div>
+      <div class="pop-arr">→</div>
+      <div class="pop-step">
+        <div class="ps-i">⚡</div>
+        <div class="ps-t">Gameplay</div>
+        <p class="ps-d">AI-verified activity tracking measures skill and performance</p>
+      </div>
+      <div class="pop-arr">→</div>
+      <div class="pop-step hi">
+        <div class="ps-i">📊</div>
+        <div class="ps-t">PoP Score</div>
+        <p class="ps-d">Score calculated per 10-min block. Max: 786. Resets each cycle</p>
+      </div>
+      <div class="pop-arr">→</div>
+      <div class="pop-step">
+        <div class="ps-i">⛏</div>
+        <div class="ps-t">Block</div>
+        <p class="ps-d">144 blocks per day. Eligible players compete for rewards</p>
+      </div>
+      <div class="pop-arr">→</div>
+      <div class="pop-step hi">
+        <div class="ps-i">💎</div>
+        <div class="ps-t">RWG Earned</div>
+        <p class="ps-d">Tokens distributed to qualifying miners each cycle</p>
+      </div>
+    </div>
+
+    <div class="pop-specs">
+      <div class="pop-spec rv d1"><div class="pv">10<span style="font-size:.55em">m</span></div><div class="pk">Block Time</div></div>
+      <div class="pop-spec rv d2"><div class="pv">144</div><div class="pk">Blocks / Day</div></div>
+      <div class="pop-spec rv d3"><div class="pv">786</div><div class="pk">Max PoP Score</div></div>
+      <div class="pop-spec rv d4"><div class="pv g">Top 10%</div><div class="pk">Earn Per Block</div></div>
+    </div>
+
+    <!-- live mining simulation -->
+    <div style="background:var(--panel);border:1px solid var(--bordr);border-top:2px solid var(--red);padding:30px;margin-top:2px" class="rv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:6px;height:6px;background:#00e676;border-radius:50%;animation:pd 1.4s infinite"></div>
+          <span style="font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:var(--white)">MINING ACTIVE</span>
+        </div>
+        <div style="font-family:'Orbitron';font-size:10px;letter-spacing:1px;color:var(--faint)">Block <span id="bn" style="color:var(--red)">#2,847,391</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+        <div style="background:var(--panel2);padding:16px">
+          <div style="font-family:'Orbitron';font-weight:900;font-size:26px;color:var(--red)">3.2</div>
+          <div style="font-family:'Orbitron';font-size:8px;letter-spacing:1.5px;color:var(--faint);text-transform:uppercase">RWG / Block</div>
+        </div>
+        <div style="background:var(--panel2);padding:16px">
+          <div style="font-family:'Orbitron';font-weight:900;font-size:26px;color:var(--gold)">48,291</div>
+          <div style="font-family:'Orbitron';font-size:8px;letter-spacing:1.5px;color:var(--faint);text-transform:uppercase">Active Miners</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-family:'Orbitron';font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:6px">
+          <span>Block Progress</span><span id="bpct" style="color:var(--red)">72%</span>
+        </div>
+        <div style="height:5px;background:var(--panel2);border:1px solid var(--border);overflow:hidden">
+          <div id="bbar" style="height:100%;width:72%;background:linear-gradient(90deg,var(--red),var(--gold));position:relative;transition:width .3s">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:#fff;box-shadow:0 0 7px #fff"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:0">
+        <div style="display:flex;justify-content:space-between;font-family:'Orbitron';font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:6px">
+          <span>Your PoP Score</span><span style="color:var(--gold)">634 / 786</span>
+        </div>
+        <div style="height:5px;background:var(--panel2);border:1px solid var(--border);overflow:hidden">
+          <div style="height:100%;width:80.7%;background:linear-gradient(90deg,var(--gold),#e8d880)"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:12px 14px;background:rgba(193,25,28,.06);border:1px solid var(--bordr)">
+        <div style="font-family:'Orbitron';font-size:9.5px;letter-spacing:1px;color:var(--muted)">Status: <span style="color:#00e676">TOP 7% · ELIGIBLE</span></div>
+        <div style="font-family:'Orbitron';font-weight:900;font-size:22px;color:var(--red)">+3.2 RWG</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   6. TOKENOMICS
+══════════════════════════════════ -->
+<section class="sec sec-b" id="tokenomics">
+  <div class="w">
+    <div style="text-align:center;max-width:660px;margin:0 auto 56px">
+      <div class="eyebrow rv" style="justify-content:center">Economics</div>
+      <h2 class="h1 rv" style="text-align:center">RWG <span class="g">Tokenomics</span></h2>
+      <div class="rule rv c"></div>
+      <p class="body-lg rv c" style="max-width:100%">A deflationary model engineered for 100 years of sustainable distribution. Every token in existence was earned through real player participation — never allocated, never reserved.</p>
+    </div>
+
+    <div class="tok-stats">
+      <div class="tok-s rv d1"><div class="tv g">786M</div><div class="tk">Total Supply</div></div>
+      <div class="tok-s rv d2"><div class="tv r">10<span style="font-size:.5em">min</span></div><div class="tk">Block Time</div></div>
+      <div class="tok-s rv d3"><div class="tv r">144</div><div class="tk">Blocks / Day</div></div>
+      <div class="tok-s rv d4"><div class="tv g">5<span style="font-size:.5em">yr</span></div><div class="tk">Halving Cycle</div></div>
+      <div class="tok-s rv d5"><div class="tv r">100<span style="font-size:.5em">yr</span></div><div class="tk">Full Emission</div></div>
+    </div>
+
+    <div class="tok-cards">
+      <div class="tok-card rv d1">
+        <div class="tc-lbl">Premine</div>
+        <div class="tc-v">0%</div>
+        <p class="tc-d">Zero tokens were created before the mining network launched. Every single RWG in existence was earned through verifiable gameplay participation.</p>
+      </div>
+      <div class="tok-card rv d2">
+        <div class="tc-lbl">VC Allocation</div>
+        <div class="tc-v">0%</div>
+        <p class="tc-d">No venture capital reserve. No investor round. No early advantage for insiders. The economics belong entirely to players who earn them.</p>
+      </div>
+      <div class="tok-card rv d3">
+        <div class="tc-lbl">Player Distribution</div>
+        <div class="tc-v g">100%</div>
+        <p class="tc-d">All 786 million tokens are distributed through Proof-of-Play block rewards over the full 100-year emission schedule. Nothing else.</p>
+      </div>
+    </div>
+
+    <div class="halving-wrap rv">
+      <div class="hw-lbl">Emission Schedule — Block Rewards Halve Every 5 Years</div>
+      <div class="h-bars" id="hbars">
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="100%"></div></div><div class="hbl">Y1–5</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="50%"></div></div><div class="hbl">Y6–10</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="25%"></div></div><div class="hbl">Y11–15</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="12.5%"></div></div><div class="hbl">Y16–20</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="6.25%"></div></div><div class="hbl">Y21–25</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="3.125%"></div></div><div class="hbl">Y26–30</div></div>
+        <div class="hbw"><div class="hb"><div class="hbf" style="height:0" data-h="1.5%"></div></div><div class="hbl">Y31+</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   7. ROADMAP
+══════════════════════════════════ -->
+<section class="sec sec-c" id="roadmap">
+  <div class="w">
+    <div style="text-align:center;max-width:560px;margin:0 auto 56px">
+      <div class="eyebrow rv" style="justify-content:center">Timeline</div>
+      <h2 class="h1 rv" style="text-align:center">Development<br><span class="r">Roadmap</span></h2>
+      <div class="rule rv c"></div>
+    </div>
+
+    <div class="rm-grid">
+      <div class="rm-card on rv d1">
+        <div class="rm-n">1</div>
+        <div class="rm-ph">// Phase One · 2025</div>
+        <div class="rm-title">FOUNDATION</div>
+        <div class="rm-bar"></div>
+        <div class="rm-items">
+          <div class="rm-item">Token infrastructure</div>
+          <div class="rm-item">Proof-of-Play network</div>
+          <div class="rm-item">Basic gameplay prototype</div>
+          <div class="rm-item">Wallet integration</div>
+          <div class="rm-item">RWG Store launch</div>
+          <div class="rm-item">Community platform</div>
+        </div>
+        <div style="margin-top:22px"><span class="tag tag-r">In Progress</span></div>
+      </div>
+      <div class="rm-card rv d2">
+        <div class="rm-n">2</div>
+        <div class="rm-ph">// Phase Two · 2026</div>
+        <div class="rm-title">EXPANSION</div>
+        <div class="rm-bar"></div>
+        <div class="rm-items">
+          <div class="rm-item">Multiplayer competition</div>
+          <div class="rm-item">Marketplace expansion</div>
+          <div class="rm-item">Guild systems</div>
+          <div class="rm-item">Competitive tournaments</div>
+          <div class="rm-item">Cross-chain assets</div>
+          <div class="rm-item">Creator tools</div>
+        </div>
+        <div style="margin-top:22px"><span class="tag tag-d">Planned</span></div>
+      </div>
+      <div class="rm-card rv d3">
+        <div class="rm-n">3</div>
+        <div class="rm-ph">// Phase Three · 2027+</div>
+        <div class="rm-title">AAA ECOSYSTEM</div>
+        <div class="rm-bar"></div>
+        <div class="rm-items">
+          <div class="rm-item">Open-world game release</div>
+          <div class="rm-item">Creator economy</div>
+          <div class="rm-item">AI-driven NPC systems</div>
+          <div class="rm-item">Global competitive leagues</div>
+          <div class="rm-item">Player governance</div>
+          <div class="rm-item">Decentralized studios</div>
+        </div>
+        <div style="margin-top:22px"><span class="tag tag-d">Future</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   8. FOUNDER
+══════════════════════════════════ -->
+<section class="sec sec-a" id="founder">
+  <div class="w">
+    <div class="eyebrow rv">The Founder</div>
+    <h2 class="h1 rv">Built By A <span class="g">Gamer.</span></h2>
+    <div class="rule rv"></div>
+    <p class="body-lg rv" style="margin-bottom:40px">The person behind the vision — and the reason RWG exists.</p>
+    <div class="founder rv">
+      <div class="fav">SJ</div>
+      <div>
+        <div class="fn">Shaik Jainuddin</div>
+        <div class="fr">Founder — Real World Gaming</div>
+        <blockquote class="fq">"Players spend thousands of hours mastering games. RWG is built to ensure that skill and dedication can translate into real digital value."</blockquote>
+        <p class="fb">Blockchain enthusiast, crypto investor, and Web3 builder developing the Proof-of-Play gaming economy. Shaik founded RWG to solve a problem every serious gamer lives firsthand — thousands of hours invested in games, zero economic return. With a background spanning digital assets, blockchain infrastructure and competitive gaming, he is building the protocol layer to permanently change that equation for every player on earth.</p>
+        <a href="https://www.linkedin.com/in/shaikjainiddin" target="_blank" rel="noopener" class="flink">&#128188; Connect on LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+   9. COMMUNITY
+══════════════════════════════════ -->
+<section class="sec sec-b" id="community">
+  <div class="w">
+    <div style="text-align:center;max-width:580px;margin:0 auto 52px">
+      <div class="eyebrow rv" style="justify-content:center">Join Us</div>
+      <h2 class="h1 rv" style="text-align:center">The RWG <span class="r">Community</span></h2>
+      <div class="rule rv c"></div>
+      <p class="body-lg rv c" style="max-width:100%">The most important asset in any ecosystem is its community. Join early — the first generation of RWG miners will shape everything that follows.</p>
+    </div>
+
+    <div class="soc-grid">
+      <a href="https://x.com/RWG__official" target="_blank" rel="noopener" class="soc-card rv d1">
+        <div class="soc-icon">✕</div>
+        <div class="soc-name">X / TWITTER</div>
+        <div class="soc-handle">@RWG__official</div>
+        <p class="soc-desc">Real-time announcements, mining updates and ecosystem news</p>
+        <div class="soc-btn">Follow</div>
+      </a>
+      <a href="https://discord.gg/ay9b9vU5b" target="_blank" rel="noopener" class="soc-card rv d2">
+        <div class="soc-icon">🎮</div>
+        <div class="soc-name">DISCORD</div>
+        <div class="soc-handle">discord.gg/ay9b9vU5b</div>
+        <p class="soc-desc">Community hub, mining strategy, beta access and direct founder contact</p>
+        <div class="soc-btn">Join Server</div>
+      </a>
+      <a href="https://www.linkedin.com/company/real-world-gaming/" target="_blank" rel="noopener" class="soc-card rv d3">
+        <div class="soc-icon">&#128188;</div>
+        <div class="soc-name">LINKEDIN</div>
+        <div class="soc-handle">Real World Gaming</div>
+        <p class="soc-desc">Professional updates, partnerships, development progress and team news</p>
+        <div class="soc-btn">Follow Company</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="hdiv"></div>
+<div style="background:linear-gradient(135deg,rgba(193,25,28,.08),rgba(198,162,62,.04));border-top:1px solid var(--bordr);border-bottom:1px solid var(--bordr);padding:64px 0;text-align:center">
+  <div class="w">
+    <div class="eyebrow rv" style="justify-content:center">Get Started</div>
+    <h2 class="h1 rv" style="font-size:clamp(28px,4.5vw,56px);text-align:center;margin-bottom:14px">Ready To <span class="r">Play</span> And <span class="g">Earn?</span></h2>
+    <div class="rule rv c"></div>
+    <p class="body-lg rv c" style="max-width:480px;margin:0 auto 34px;text-align:center">The RWG ecosystem is building now. Join the community, watch the store launch and be part of the first generation of Proof-of-Play miners.</p>
+    <div class="btns rv c">
+      <a href="#ecosystem" class="btn btn-r">Explore Ecosystem</a>
+      <a href="#tokenomics" class="btn btn-g">View Tokenomics</a>
+      <a href="https://discord.gg/ay9b9vU5b" target="_blank" class="btn btn-o">Join Discord</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+   FOOTER
+══════════════════════════════════ -->
+<footer class="foot" id="footer">
+  <div class="w">
+    <div class="foot-top">
+      <div>
+        <div class="f-logo">
+          <div class="f-logo-mark">R</div>
+          <span class="f-logo-t">RW<em>G</em></span>
+        </div>
+        <p class="f-tag">Building the future where every gamer earns real value for their time, skill and passion.</p>
+        <div class="f-socs">
+          <a href="https://x.com/RWG__official" target="_blank" rel="noopener" class="f-soc">✕</a>
+          <a href="https://discord.gg/ay9b9vU5b" target="_blank" rel="noopener" class="f-soc">&#127918;</a>
+          <a href="https://www.linkedin.com/company/real-world-gaming/" target="_blank" rel="noopener" class="f-soc">&#128188;</a>
+          <a href="https://www.linkedin.com/in/shaikjainiddin" target="_blank" rel="noopener" class="f-soc">&#128100;</a>
+        </div>
+        <div class="f-founder">
+          <div class="ff-n">Shaik Jainuddin</div>
+          <div class="ff-r">Founder, Real World Gaming</div>
+          <a href="https://www.linkedin.com/in/shaikjainiddin" target="_blank" rel="noopener" class="ff-l">&#128188; LinkedIn →</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-t">Platform</div>
+        <div class="f-links">
+          <a href="#home" class="f-link">Home</a>
+          <a href="#ecosystem" class="f-link">RWG Store</a>
+          <a href="#ecosystem" class="f-link">RWG Launcher</a>
+          <a href="#ecosystem" class="f-link">RWG Studio</a>
+          <a href="#pop" class="f-link">Mining</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-t">Resources</div>
+        <div class="f-links">
+          <a href="#problem" class="f-link">Vision</a>
+          <a href="#tokenomics" class="f-link">Tokenomics</a>
+          <a href="#roadmap" class="f-link">Roadmap</a>
+          <a href="#founder" class="f-link">Founder</a>
+          <a href="#community" class="f-link">Community</a>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-t">Connect</div>
+        <div class="f-links">
+          <a href="https://x.com/RWG__official" target="_blank" rel="noopener" class="f-link">X / Twitter</a>
+          <a href="https://discord.gg/ay9b9vU5b" target="_blank" rel="noopener" class="f-link">Discord</a>
+          <a href="https://www.linkedin.com/company/real-world-gaming/" target="_blank" rel="noopener" class="f-link">LinkedIn</a>
+          <a href="https://www.linkedin.com/in/shaikjainiddin" target="_blank" rel="noopener" class="f-link">Founder LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <div class="f-copy">© 2025 Real World Gaming. All rights reserved.</div>
+      <div class="f-supply">RWG · 786,000,000 · Proof-of-Play · 100yr Emission · Zero Premine</div>
+      <div class="f-slogan">PLAY<span>.</span> OWN<span>.</span> EARN<span>.</span></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════
+   CURSOR
+══════════════════════════════ */
+(function(){
+  var d=document.getElementById('cd'),r=document.getElementById('cr');
+  if(!d||!r||!matchMedia('(pointer:fine)').matches)return;
+  var mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',function(e){
+    mx=e.clientX;my=e.clientY;
+    d.style.left=mx+'px';d.style.top=my+'px';
+  });
+  (function loop(){
+    rx+=(mx-rx)*.11;ry+=(my-ry)*.11;
+    r.style.left=rx+'px';r.style.top=ry+'px';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('a,button,.eco-card,.cs-card,.pop-step,.rm-card,.tok-s,.soc-card,.feat-card').forEach(function(el){
+    el.addEventListener('mouseenter',function(){document.body.classList.add('hov')});
+    el.addEventListener('mouseleave',function(){document.body.classList.remove('hov')});
+  });
+})();
+
+/* ══════════════════════════════
+   NAV SCROLL
+══════════════════════════════ */
+var nav=document.getElementById('nav');
+window.addEventListener('scroll',function(){nav.classList.toggle('s',scrollY>40)},{passive:true});
+
+/* ══════════════════════════════
+   MOBILE MENU
+══════════════════════════════ */
+var ham=document.getElementById('ham'),mob=document.getElementById('mob');
+ham.addEventListener('click',function(){
+  var o=mob.classList.toggle('o');
+  ham.classList.toggle('o',o);
+  document.body.style.overflow=o?'hidden':'';
+});
+function cm(){mob.classList.remove('o');ham.classList.remove('o');document.body.style.overflow=''}
+
+/* ══════════════════════════════
+   REVEAL
+══════════════════════════════ */
+(function(){
+  var els=document.querySelectorAll('.rv');
+  if(!els.length)return;
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+    });
+  },{threshold:.07,rootMargin:'0px 0px -8px 0px'});
+  els.forEach(function(el){io.observe(el)});
+})();
+
+/* ══════════════════════════════
+   HALVING BARS
+══════════════════════════════ */
+(function(){
+  var c=document.getElementById('hbars');if(!c)return;
+  var done=false;
+  var io=new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting&&!done){
+      done=true;
+      c.querySelectorAll('.hbf').forEach(function(f,i){
+        setTimeout(function(){f.style.height=f.getAttribute('data-h')},i*90);
+      });
+      io.disconnect();
+    }
+  },{threshold:.25});
+  io.observe(c);
+})();
+
+/* ══════════════════════════════
+   LIVE BLOCK COUNTER
+══════════════════════════════ */
+(function(){
+  var bn=document.getElementById('bn'),bpct=document.getElementById('bpct'),bbar=document.getElementById('bbar');
+  if(!bn)return;
+  var block=2847391,pct=72;
+  setInterval(function(){
+    pct+=Math.random()*2.8;
+    if(pct>=100){pct=0;block++}
+    bn.textContent='#'+block.toLocaleString();
+    bpct.textContent=pct.toFixed(0)+'%';
+    bbar.style.width=pct.toFixed(1)+'%';
+  },700);
+})();
+</script>
+</body>
+</html>
